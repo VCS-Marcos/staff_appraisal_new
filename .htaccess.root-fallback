@@ -1,0 +1,21 @@
+# Fallback for shared hosts where you CANNOT point the domain's document
+# root at /public (e.g. plain FTP-only cPanel accounts where the domain
+# is locked to public_html). Rename this file to ".htaccess" and place it
+# at the same level as the "public" folder (your actual document root).
+#
+# If your host lets you set the document root to /public directly, you
+# do NOT need this file — use that instead, it's simpler and more secure
+# (nothing outside /public is web-reachable at all).
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Already inside /public — do nothing.
+    RewriteCond %{REQUEST_URI} ^/public/
+    RewriteRule ^(.*)$ - [L]
+
+    # Route everything else through /public.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ /public/$1 [L]
+</IfModule>
