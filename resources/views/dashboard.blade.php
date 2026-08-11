@@ -42,6 +42,25 @@
                         </a>
                     </div>
                 </div>
+            @else
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                        <div class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</div>
+                        <div class="text-sm text-gray-500">{{ auth()->user()->isReviewer() ? 'Team Appraisals' : 'My Appraisals' }}</div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                        <div class="text-2xl font-bold text-amber-600">{{ $stats['pending'] }}</div>
+                        <div class="text-sm text-gray-500">{{ auth()->user()->isReviewer() ? 'Awaiting My Review' : 'Awaiting My Action' }}</div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                        <div class="text-2xl font-bold text-indigo-600">{{ $stats['in_progress'] }}</div>
+                        <div class="text-sm text-gray-500">In Progress</div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                        <div class="text-2xl font-bold text-emerald-600">{{ $stats['completed'] }}</div>
+                        <div class="text-sm text-gray-500">Completed</div>
+                    </div>
+                </div>
             @endif
 
             @if (isset($teamAppraisals) && $teamAppraisals->isNotEmpty())

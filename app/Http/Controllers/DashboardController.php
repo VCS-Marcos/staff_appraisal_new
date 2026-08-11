@@ -39,6 +39,26 @@ class DashboardController extends Controller
                 'pending_signoff' => Appraisal::where('status', AppraisalStatus::PendingSignoff)->count(),
                 'completed' => Appraisal::where('status', AppraisalStatus::Completed)->count(),
             ];
+        } elseif ($user->isReviewer()) {
+            $statusCounts = $data['teamAppraisals']->countBy(fn ($a) => $a->status->value);
+
+            $data['stats'] = [
+                'total' => $data['teamAppraisals']->count(),
+                'pending' => $statusCounts->get(AppraisalStatus::PendingReviewer->value, 0),
+                'in_progress' => $statusCounts->get(AppraisalStatus::PendingEmployee->value, 0)
+                    + $statusCounts->get(AppraisalStatus::PendingSignoff->value, 0),
+                'completed' => $statusCounts->get(AppraisalStatus::Completed->value, 0),
+            ];
+        } else {
+            $statusCounts = $data['myAppraisals']->countBy(fn ($a) => $a->status->value);
+
+            $data['stats'] = [
+                'total' => $data['myAppraisals']->count(),
+                'pending' => $statusCounts->get(AppraisalStatus::PendingEmployee->value, 0),
+                'in_progress' => $statusCounts->get(AppraisalStatus::PendingReviewer->value, 0)
+                    + $statusCounts->get(AppraisalStatus::PendingSignoff->value, 0),
+                'completed' => $statusCounts->get(AppraisalStatus::Completed->value, 0),
+            ];
         }
 
         return view('dashboard', $data);
