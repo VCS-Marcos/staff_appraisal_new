@@ -7,16 +7,29 @@ use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $users = User::with('lineManager')->orderBy('name')->paginate(20);
+        $users = User::with('lineManager')
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $term = '%'.$request->string('search').'%';
+                $q->where(fn ($q2) => $q2->where('name', 'like', $term)
+                    ->orWhere('email', 'like', $term)
+                    ->orWhere('position', 'like', $term));
+            })
+            ->when($request->filled('line_manager_id'), fn ($q) => $q->where('line_manager_id', $request->integer('line_manager_id')))
+            ->orderBy('name')
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('admin.users.index', compact('users'));
+        $managers = User::where('is_active', true)->orderBy('name')->get();
+
+        return view('admin.users.index', compact('users', 'managers'));
     }
 
     public function create(): View

@@ -11,7 +11,7 @@
 
             @if ($teamAppraisals->isNotEmpty())
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <h3 class="text-lg font-semibold text-gray-800 p-6 pb-0">As Reviewer — Your Team</h3>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide p-4 pb-0">As Reviewer — Your Team</p>
                     <table class="min-w-full divide-y divide-gray-200 mt-4">
                         <thead class="bg-gray-50">
                             <tr>
@@ -41,7 +41,7 @@
             @endif
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <h3 class="text-lg font-semibold text-gray-800 p-6 pb-0">My Appraisal History</h3>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide p-4 pb-0">My Appraisal History</p>
                 <table class="min-w-full divide-y divide-gray-200 mt-4">
                     <thead class="bg-gray-50">
                         <tr>
