@@ -24,7 +24,9 @@ class StoreAppraisalRequest extends FormRequest
             'cycle_id' => ['required', 'integer', Rule::exists('appraisal_cycles', 'id')],
             'appraisal_date' => ['nullable', 'date'],
             'targets' => ['array'],
-            'targets.*' => ['nullable', 'string'],
+            'targets.*.target_text' => ['nullable', 'string'],
+            'targets.*.action_text' => ['nullable', 'string'],
+            'targets.*.success_criteria' => ['nullable', 'string'],
         ];
     }
 

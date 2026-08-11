@@ -1,7 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Professional Development Hours Report') }}</h2>
+            <div>
+                <a href="{{ route('reports.index') }}" class="text-xs text-gray-500 hover:text-gray-700">&larr; Reports</a>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Professional Development Hours Report') }}</h2>
+            </div>
             <a href="{{ route('reports.pd-hours.export', request()->query()) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                 <x-icon name="download" class="w-3.5 h-3.5" /> Export CSV
             </a>

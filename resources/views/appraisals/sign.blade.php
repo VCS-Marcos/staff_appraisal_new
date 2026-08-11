@@ -9,7 +9,10 @@
                 Please review the appraisal below carefully. Signing confirms this is an accurate record of the appraisal.
             </div>
 
-            @include('appraisals._summary')
+            <x-appraisal-header :appraisal="$appraisal" />
+
+            @include('appraisals._tabs')
+            @include('appraisals._signoff')
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <h2 class="text-base font-bold text-gray-800 mb-4">Confirm and Sign</h2>

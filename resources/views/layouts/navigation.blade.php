@@ -4,7 +4,7 @@
         ['route' => 'appraisals.index', 'active' => request()->routeIs('appraisals.*'), 'icon' => 'appraisals', 'label' => 'My Appraisals'],
     ];
     if (Auth::user()->isAdmin() || Auth::user()->isReviewer()) {
-        $tabs[] = ['route' => 'reports.pd-hours', 'active' => request()->routeIs('reports.*'), 'icon' => 'reports', 'label' => 'Reports'];
+        $tabs[] = ['route' => 'reports.index', 'active' => request()->routeIs('reports.*'), 'icon' => 'reports', 'label' => 'Reports'];
     }
     if (Auth::user()->isAdmin()) {
         $tabs[] = ['route' => 'admin.users.index', 'active' => request()->routeIs('admin.users.*'), 'icon' => 'users', 'label' => 'Users'];

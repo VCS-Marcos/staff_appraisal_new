@@ -69,7 +69,11 @@ class AppraisalController extends Controller
         return Appraisal::query()
             ->when($includeStatus, fn ($q) => $q->with(['employee', 'reviewer', 'cycle']))
             ->when($request->filled('cycle_id'), fn ($q) => $q->where('cycle_id', $request->integer('cycle_id')))
-            ->when($includeStatus && $request->filled('status'), fn ($q) => $q->where('status', $request->string('status')));
+            ->when($includeStatus && $request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $term = '%'.$request->string('search').'%';
+                $q->whereHas('employee', fn ($q2) => $q2->where('name', 'like', $term));
+            });
     }
 
     public function create(Request $request): View
@@ -94,15 +98,21 @@ class AppraisalController extends Controller
         ]);
 
         $number = 1;
-        foreach (($data['targets'] ?? []) as $text) {
-            if (blank($text)) {
+        foreach (($data['targets'] ?? []) as $targetInput) {
+            $isBlank = blank($targetInput['target_text'] ?? null)
+                && blank($targetInput['action_text'] ?? null)
+                && blank($targetInput['success_criteria'] ?? null);
+
+            if ($isBlank) {
                 continue;
             }
 
             $appraisal->targets()->create([
                 'target_type' => TargetType::Current,
                 'target_number' => $number++,
-                'target_text' => $text,
+                'target_text' => $targetInput['target_text'] ?? null,
+                'action_text' => $targetInput['action_text'] ?? null,
+                'success_criteria' => $targetInput['success_criteria'] ?? null,
             ]);
         }
 
@@ -134,7 +144,11 @@ class AppraisalController extends Controller
             ->first();
 
         return response()->json([
-            'targets' => $prior?->targets->pluck('target_text', 'target_number') ?? [],
+            'targets' => $prior?->targets->map(fn ($t) => [
+                'target_text' => $t->target_text,
+                'action_text' => $t->action_text,
+                'success_criteria' => $t->success_criteria,
+            ])->values() ?? [],
         ]);
     }
 }

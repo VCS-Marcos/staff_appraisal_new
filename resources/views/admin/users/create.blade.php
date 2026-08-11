@@ -9,7 +9,10 @@
                 <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-4">
                     @csrf
                     @include('admin.users._form', ['user' => null])
-                    <div class="flex justify-end">
+                    <div class="flex justify-end gap-3">
+                        <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                            Cancel
+                        </a>
                         <x-primary-button>Create Account</x-primary-button>
                     </div>
                 </form>

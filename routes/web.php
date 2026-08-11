@@ -18,7 +18,6 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::prefix('appraisals')->name('appraisals.')->group(function () {
         Route::get('/', [AppraisalController::class, 'index'])->name('index');
@@ -33,8 +32,16 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
     });
 
     Route::prefix('reports')->name('reports.')->middleware('role:admin,reviewer')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('pd-hours', [ReportController::class, 'pdHours'])->name('pd-hours');
         Route::get('pd-hours/export', [ReportController::class, 'exportPdHours'])->name('pd-hours.export');
+
+        Route::middleware('role:admin')->group(function () {
+            Route::get('completion', [ReportController::class, 'completion'])->name('completion');
+            Route::get('completion/export', [ReportController::class, 'exportCompletion'])->name('completion.export');
+            Route::get('ratings', [ReportController::class, 'ratings'])->name('ratings');
+            Route::get('ratings/export', [ReportController::class, 'exportRatings'])->name('ratings.export');
+        });
     });
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {

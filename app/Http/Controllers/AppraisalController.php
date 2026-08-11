@@ -46,7 +46,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('view', $appraisal);
 
-        $appraisal->load(['employee', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
         return view('appraisals.show', compact('appraisal'));
     }
@@ -55,7 +55,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('updateAsEmployee', $appraisal);
 
-        $appraisal->load(['currentTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'professionalDevelopment']);
 
         return view('appraisals.edit', compact('appraisal'));
     }
@@ -109,7 +109,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('updateAsReviewer', $appraisal);
 
-        $appraisal->load(['currentTargets', 'cycle', 'nextYearTargets']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
         return view('appraisals.review', compact('appraisal'));
     }
@@ -163,7 +163,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('sign', $appraisal);
 
-        $appraisal->load(['employee', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
         return view('appraisals.sign', compact('appraisal'));
     }

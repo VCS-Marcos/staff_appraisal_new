@@ -9,7 +9,10 @@
                 <form method="POST" action="{{ route('admin.cycles.store') }}" class="space-y-4">
                     @csrf
                     @include('admin.cycles._form', ['cycle' => null])
-                    <div class="flex justify-end">
+                    <div class="flex justify-end gap-3">
+                        <a href="{{ route('admin.cycles.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                            Cancel
+                        </a>
                         <x-primary-button>Create Cycle</x-primary-button>
                     </div>
                 </form>

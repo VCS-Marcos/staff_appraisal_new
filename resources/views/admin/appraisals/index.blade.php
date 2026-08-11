@@ -32,6 +32,11 @@
                 <div class="p-4 border-b border-gray-100">
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">All Appraisals</p>
                     <form method="GET" class="flex flex-wrap gap-3">
+                        <div class="relative flex-1 min-w-[200px]">
+                            <x-icon name="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by staff name..."
+                                   class="w-full pl-9 border-gray-300 rounded-md shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        </div>
                         <select name="cycle_id" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
                             <option value="">All Cycles</option>
                             @foreach ($cycles as $cycle)
@@ -44,6 +49,10 @@
                                 <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
                             @endforeach
                         </select>
+                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50">Search</button>
+                        @if (request('search') || request('cycle_id') || request('status'))
+                            <a href="{{ route('admin.appraisals.index') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Clear</a>
+                        @endif
                     </form>
                 </div>
 
@@ -73,6 +82,7 @@
                                         </form>
                                     @endif
                                     <a href="{{ route('appraisals.show', $appraisal) }}" class="text-indigo-600 hover:underline">View</a>
+                                    <a href="{{ route('appraisals.pdf', $appraisal) }}" class="text-gray-600 hover:underline">Download</a>
                                 </td>
                             </tr>
                         @empty
