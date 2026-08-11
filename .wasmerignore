@@ -1,0 +1,17 @@
+.git
+.github
+.claude
+.wasmer-build
+node_modules
+tests
+phpunit.xml
+.env
+.env.*
+!.env.production.example
+database/database.sqlite
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/app/public
+DEPLOYMENT.md
+README.md

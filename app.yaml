@@ -1,0 +1,35 @@
+kind: wasmer.io/App.v0
+name: staff-appraisal-test
+owner: ghostsandshadowz
+package: .
+description: "Staff Appraisal System — test deployment"
+
+capabilities:
+  database:
+    engine: mysql
+
+scaling:
+  mode: single_concurrency
+
+env:
+  APP_NAME: "Staff Appraisal"
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: "https://staff-appraisal-test.wasmer.app"
+  DB_CONNECTION: mysql
+  APP_LOCALE: en
+  APP_FALLBACK_LOCALE: en
+  APP_MAINTENANCE_DRIVER: file
+  BCRYPT_ROUNDS: "12"
+  LOG_CHANNEL: stderr
+  LOG_LEVEL: error
+  SESSION_DRIVER: database
+  SESSION_LIFETIME: "120"
+  SESSION_ENCRYPT: "false"
+  SESSION_SECURE_COOKIE: "true"
+  SESSION_PATH: "/"
+  BROADCAST_CONNECTION: log
+  FILESYSTEM_DISK: local
+  QUEUE_CONNECTION: sync
+  CACHE_STORE: database
+  MAIL_MAILER: log
