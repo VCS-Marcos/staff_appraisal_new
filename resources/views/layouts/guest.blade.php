@@ -22,7 +22,7 @@
                         <x-application-logo class="w-7 h-7 text-white" />
                     </div>
                     <h1 class="text-xl font-bold text-gray-900">{{ config('app.name') }} System</h1>
-                    <p class="text-sm text-gray-500 mt-1">Independent School Seychelles</p>
+                    <p class="text-sm text-gray-500 mt-1">{{ config('app.subtitle') }}</p>
                 </div>
 
                 {{ $slot }}

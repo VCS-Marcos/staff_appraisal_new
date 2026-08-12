@@ -1,5 +1,5 @@
 kind: wasmer.io/App.v0
-name: staff-appraisal-test
+name: hr-appraisal-preview
 owner: ghostsandshadowz
 package: .
 description: "Staff Appraisal System — test deployment"
@@ -15,7 +15,8 @@ env:
   APP_NAME: "Staff Appraisal"
   APP_ENV: production
   APP_DEBUG: "false"
-  APP_URL: "https://staff-appraisal-test.wasmer.app"
+  APP_URL: "https://hr-appraisal-preview.wasmer.app"
+  APP_SUBTITLE: "Staff Performance Management System"
   DB_CONNECTION: mysql
   APP_LOCALE: en
   APP_FALLBACK_LOCALE: en
