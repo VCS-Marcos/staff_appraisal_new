@@ -7,7 +7,7 @@
         $tabs[] = ['route' => 'reports.index', 'active' => request()->routeIs('reports.*'), 'icon' => 'reports', 'label' => 'Reports'];
     }
     if (Auth::user()->isAdmin()) {
-        $tabs[] = ['route' => 'admin.users.index', 'active' => request()->routeIs('admin.users.*'), 'icon' => 'users', 'label' => 'Users'];
+        $tabs[] = ['route' => 'admin.users.index', 'active' => request()->routeIs('admin.users.*'), 'icon' => 'users', 'label' => 'All Staff'];
         $tabs[] = ['route' => 'admin.cycles.index', 'active' => request()->routeIs('admin.cycles.*'), 'icon' => 'cycles', 'label' => 'Cycles'];
         $tabs[] = ['route' => 'admin.appraisals.index', 'active' => request()->routeIs('admin.appraisals.*'), 'icon' => 'list', 'label' => 'All Appraisals'];
     }

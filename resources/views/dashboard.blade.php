@@ -5,34 +5,38 @@
         </h2>
     </x-slot>
 
+    @php
+        $cardBase = 'bg-white border border-gray-200 rounded-xl p-4 block transition hover:border-indigo-300 hover:shadow-sm';
+    @endphp
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             @if (auth()->user()->isAdmin())
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <a href="{{ route('admin.users.index') }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-gray-800">{{ $stats['users'] }}</div>
                         <div class="text-sm text-gray-500">Staff Accounts</div>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    </a>
+                    <a href="{{ route('admin.cycles.index', ['active' => 1]) }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-indigo-600">{{ $stats['active_cycles'] }}</div>
                         <div class="text-sm text-gray-500">Active Cycles</div>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    </a>
+                    <a href="{{ route('admin.appraisals.index', ['status' => 'in_progress']) }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-amber-600">{{ $stats['pending_employee'] + $stats['pending_reviewer'] + $stats['pending_signoff'] }}</div>
                         <div class="text-sm text-gray-500">In Progress</div>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    </a>
+                    <a href="{{ route('admin.appraisals.index', ['status' => 'completed']) }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-emerald-600">{{ $stats['completed'] }}</div>
                         <div class="text-sm text-gray-500">Completed</div>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Quick Actions</h3>
                     <div class="flex flex-wrap gap-4">
                         <a href="{{ route('admin.appraisals.create') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
-                            <x-icon name="plus" class="w-4 h-4" /> Open a new appraisal
+                            <x-icon name="plus" class="w-4 h-4" /> Create an appraisal
                         </a>
                         <a href="{{ route('admin.cycles.create') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
                             <x-icon name="plus" class="w-4 h-4" /> Create a cycle
@@ -44,22 +48,22 @@
                 </div>
             @else
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</div>
                         <div class="text-sm text-gray-500">{{ auth()->user()->isReviewer() ? 'Team Appraisals' : 'My Appraisals' }}</div>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    </a>
+                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-amber-600">{{ $stats['pending'] }}</div>
                         <div class="text-sm text-gray-500">{{ auth()->user()->isReviewer() ? 'Awaiting My Review' : 'Awaiting My Action' }}</div>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    </a>
+                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-indigo-600">{{ $stats['in_progress'] }}</div>
                         <div class="text-sm text-gray-500">In Progress</div>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    </a>
+                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-emerald-600">{{ $stats['completed'] }}</div>
                         <div class="text-sm text-gray-500">Completed</div>
-                    </div>
+                    </a>
                 </div>
             @endif
 

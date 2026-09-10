@@ -41,6 +41,8 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
             Route::get('completion/export', [ReportController::class, 'exportCompletion'])->name('completion.export');
             Route::get('ratings', [ReportController::class, 'ratings'])->name('ratings');
             Route::get('ratings/export', [ReportController::class, 'exportRatings'])->name('ratings.export');
+            Route::get('audit', [ReportController::class, 'audit'])->name('audit');
+            Route::get('audit/export', [ReportController::class, 'exportAudit'])->name('audit.export');
         });
     });
 
@@ -52,8 +54,11 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
         Route::get('appraisals/export', [AdminAppraisalController::class, 'exportCsv'])->name('appraisals.export');
         Route::get('appraisals/create', [AdminAppraisalController::class, 'create'])->name('appraisals.create');
         Route::post('appraisals', [AdminAppraisalController::class, 'store'])->name('appraisals.store');
-        Route::patch('appraisals/{appraisal}/open', [AdminAppraisalController::class, 'open'])->name('appraisals.open');
         Route::get('appraisals/prior-targets/{user}', [AdminAppraisalController::class, 'priorTargets'])->name('appraisals.prior-targets');
+        Route::get('appraisals/{appraisal}/edit', [AdminAppraisalController::class, 'edit'])->name('appraisals.edit');
+        Route::put('appraisals/{appraisal}', [AdminAppraisalController::class, 'update'])->name('appraisals.update');
+        Route::delete('appraisals/{appraisal}', [AdminAppraisalController::class, 'destroy'])->name('appraisals.destroy');
+        Route::patch('appraisals/{appraisal}/open', [AdminAppraisalController::class, 'open'])->name('appraisals.open');
     });
 });
 

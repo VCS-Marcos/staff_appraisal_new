@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Appraisal;
 use App\Models\AppraisalCycle;
+use App\Models\AuditLog;
 use App\Models\ProfessionalDevelopment;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -73,7 +75,13 @@ class ReportController extends Controller
     public function ratings(Request $request): View
     {
         $cycles = AppraisalCycle::orderByDesc('start_date')->get();
-        $appraisals = $this->ratingsQuery($request)->paginate(20)->withQueryString();
+
+        $appraisals = $this->ratingsQuery($request)
+            ->with(['employee', 'reviewer', 'cycle'])
+            ->orderByDesc('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
         $distribution = $this->ratingsQuery($request)
             ->selectRaw('overall_rating, count(*) as total')
             ->groupBy('overall_rating')
@@ -84,7 +92,10 @@ class ReportController extends Controller
 
     public function exportRatings(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $appraisals = $this->ratingsQuery($request)->get();
+        $appraisals = $this->ratingsQuery($request)
+            ->with(['employee', 'reviewer', 'cycle'])
+            ->orderByDesc('created_at')
+            ->get();
 
         $filename = 'staff-ratings-report-'.now()->format('Y-m-d').'.csv';
 
@@ -110,9 +121,57 @@ class ReportController extends Controller
     private function ratingsQuery(Request $request): Builder
     {
         return Appraisal::query()
-            ->with(['employee', 'reviewer', 'cycle'])
             ->whereNotNull('overall_rating')
-            ->when($request->filled('cycle_id'), fn ($q) => $q->where('cycle_id', $request->integer('cycle_id')))
+            ->when($request->filled('cycle_id'), fn ($q) => $q->where('cycle_id', $request->integer('cycle_id')));
+    }
+
+    public function audit(Request $request): View
+    {
+        $logs = $this->auditQuery($request)
+            ->with('user')
+            ->paginate(30)
+            ->withQueryString();
+
+        $users = User::orderBy('name')->get(['id', 'name']);
+        $actions = AuditLog::query()->select('action')->distinct()->orderBy('action')->pluck('action');
+
+        return view('reports.audit', compact('logs', 'users', 'actions'));
+    }
+
+    public function exportAudit(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $logs = $this->auditQuery($request)->with('user')->get();
+
+        $filename = 'activity-log-'.now()->format('Y-m-d').'.csv';
+
+        return Response::streamDownload(function () use ($logs) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['When', 'User', 'Action', 'Entity', 'Entity ID', 'Description', 'IP Address']);
+
+            foreach ($logs as $log) {
+                fputcsv($out, [
+                    optional($log->created_at)->format('Y-m-d H:i:s'),
+                    $log->user?->name ?? 'System',
+                    $log->action,
+                    $log->entity_type,
+                    $log->entity_id,
+                    $log->description,
+                    $log->ip_address,
+                ]);
+            }
+
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    private function auditQuery(Request $request): Builder
+    {
+        return AuditLog::query()
+            ->when($request->filled('user_id'), fn ($q) => $q->where('user_id', $request->integer('user_id')))
+            ->when($request->filled('action'), fn ($q) => $q->where('action', $request->string('action')))
+            ->when($request->filled('entity_type'), fn ($q) => $q->where('entity_type', $request->string('entity_type')))
+            ->when($request->filled('from'), fn ($q) => $q->whereDate('created_at', '>=', $request->date('from')))
+            ->when($request->filled('to'), fn ($q) => $q->whereDate('created_at', '<=', $request->date('to')))
             ->orderByDesc('created_at');
     }
 

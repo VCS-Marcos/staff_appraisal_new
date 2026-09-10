@@ -6,18 +6,26 @@ use App\Enums\AppraisalStatus;
 use App\Enums\TargetType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAppraisalRequest;
+use App\Http\Requests\Admin\UpdateAppraisalRequest;
 use App\Models\Appraisal;
 use App\Models\AppraisalCycle;
+use App\Models\AuditLog;
 use App\Models\User;
 use App\Notifications\AppraisalOpened;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\View\View;
 
 class AppraisalController extends Controller
 {
+    /**
+     * Statuses that make up the "in progress" bucket used by the dashboard cards.
+     */
+    private const IN_PROGRESS_STATUSES = ['pending_employee', 'pending_reviewer', 'pending_signoff'];
+
     public function index(Request $request): View
     {
         $appraisals = $this->filteredAppraisals($request)
@@ -69,7 +77,13 @@ class AppraisalController extends Controller
         return Appraisal::query()
             ->when($includeStatus, fn ($q) => $q->with(['employee', 'reviewer', 'cycle']))
             ->when($request->filled('cycle_id'), fn ($q) => $q->where('cycle_id', $request->integer('cycle_id')))
-            ->when($includeStatus && $request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
+            ->when($includeStatus && $request->filled('status'), function ($q) use ($request) {
+                $status = (string) $request->string('status');
+
+                $status === 'in_progress'
+                    ? $q->whereIn('status', self::IN_PROGRESS_STATUSES)
+                    : $q->where('status', $status);
+            })
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->string('search').'%';
                 $q->whereHas('employee', fn ($q2) => $q2->where('name', 'like', $term));
@@ -88,35 +102,95 @@ class AppraisalController extends Controller
     public function store(StoreAppraisalRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $openNow = ($data['intent'] ?? 'draft') === 'open';
 
-        $appraisal = Appraisal::create([
-            'user_id' => $data['user_id'],
-            'reviewer_id' => $data['reviewer_id'],
-            'cycle_id' => $data['cycle_id'],
-            'appraisal_date' => $data['appraisal_date'] ?? null,
-            'status' => AppraisalStatus::Draft,
-        ]);
-
-        $number = 1;
-        foreach (($data['targets'] ?? []) as $targetInput) {
-            $isBlank = blank($targetInput['target_text'] ?? null)
-                && blank($targetInput['action_text'] ?? null)
-                && blank($targetInput['success_criteria'] ?? null);
-
-            if ($isBlank) {
-                continue;
-            }
-
-            $appraisal->targets()->create([
-                'target_type' => TargetType::Current,
-                'target_number' => $number++,
-                'target_text' => $targetInput['target_text'] ?? null,
-                'action_text' => $targetInput['action_text'] ?? null,
-                'success_criteria' => $targetInput['success_criteria'] ?? null,
+        $appraisal = DB::transaction(function () use ($data, $openNow) {
+            $appraisal = Appraisal::create([
+                'user_id' => $data['user_id'],
+                'reviewer_id' => $data['reviewer_id'],
+                'cycle_id' => $data['cycle_id'],
+                'appraisal_date' => $data['appraisal_date'] ?? null,
+                'status' => $openNow ? AppraisalStatus::PendingEmployee : AppraisalStatus::Draft,
             ]);
+
+            $this->syncCurrentTargets($appraisal, $data['targets'] ?? []);
+
+            return $appraisal;
+        });
+
+        $appraisal->load(['employee', 'cycle']);
+
+        if ($openNow) {
+            $appraisal->employee->notify(new AppraisalOpened($appraisal));
+            AuditLog::record('appraisal.created', $appraisal, sprintf(
+                'Created and opened appraisal for %s (%s %s) — awaiting employee',
+                $appraisal->employee->name, $appraisal->cycle->name, $appraisal->cycle->term->value,
+            ));
+
+            return redirect()->route('admin.appraisals.index')
+                ->with('status', 'Appraisal created and opened for the employee.');
         }
 
+        AuditLog::record('appraisal.created', $appraisal, sprintf(
+            'Created draft appraisal for %s (%s %s)',
+            $appraisal->employee->name, $appraisal->cycle->name, $appraisal->cycle->term->value,
+        ));
+
         return redirect()->route('admin.appraisals.index')->with('status', 'Appraisal created as draft.');
+    }
+
+    public function edit(Appraisal $appraisal): View
+    {
+        $this->authorize('update', $appraisal);
+
+        $appraisal->load(['employee', 'reviewer', 'cycle', 'currentTargets']);
+        $users = User::where('is_active', true)->orderBy('name')->get();
+
+        return view('admin.appraisals.edit', compact('appraisal', 'users'));
+    }
+
+    public function update(UpdateAppraisalRequest $request, Appraisal $appraisal): RedirectResponse
+    {
+        $data = $request->validated();
+
+        DB::transaction(function () use ($appraisal, $data) {
+            $appraisal->update([
+                'user_id' => $data['user_id'],
+                'reviewer_id' => $data['reviewer_id'],
+                'appraisal_date' => $data['appraisal_date'] ?? null,
+            ]);
+
+            $this->syncCurrentTargets($appraisal, $data['targets'] ?? [], preserveResponses: true);
+        });
+
+        $appraisal->load(['employee', 'cycle']);
+
+        AuditLog::record('appraisal.updated', $appraisal, sprintf(
+            'Edited appraisal for %s (%s %s)',
+            $appraisal->employee->name, $appraisal->cycle->name, $appraisal->cycle->term->value,
+        ));
+
+        return redirect()->route('admin.appraisals.index')->with('status', 'Appraisal updated.');
+    }
+
+    public function destroy(Appraisal $appraisal): RedirectResponse
+    {
+        $this->authorize('delete', $appraisal);
+
+        $appraisal->loadMissing(['employee', 'cycle']);
+        $summary = sprintf(
+            'Deleted appraisal for %s (%s %s), status %s',
+            $appraisal->employee->name,
+            $appraisal->cycle->name,
+            $appraisal->cycle->term->value,
+            $appraisal->status->label(),
+        );
+
+        $appraisal->delete();
+
+        AuditLog::record('appraisal.deleted', $appraisal, $summary);
+
+        return redirect()->route('admin.appraisals.index')->with('status', 'Appraisal deleted.');
     }
 
     public function open(Appraisal $appraisal): RedirectResponse
@@ -126,9 +200,52 @@ class AppraisalController extends Controller
         if ($appraisal->status === AppraisalStatus::Draft) {
             $appraisal->update(['status' => AppraisalStatus::PendingEmployee]);
             $appraisal->employee->notify(new AppraisalOpened($appraisal));
+
+            AuditLog::record('appraisal.opened', $appraisal, sprintf(
+                'Opened appraisal for %s — now awaiting employee', $appraisal->employee->name,
+            ));
         }
 
         return redirect()->back()->with('status', 'Appraisal opened for employee.');
+    }
+
+    /**
+     * Replace an appraisal's Section 1 (current) targets from form input.
+     * When $preserveResponses is set, any employee-entered target_met / comments
+     * are carried over onto the matching target row (matched by hidden id).
+     *
+     * @param  array<int, array<string, mixed>>  $targets
+     */
+    private function syncCurrentTargets(Appraisal $appraisal, array $targets, bool $preserveResponses = false): void
+    {
+        $existing = $preserveResponses
+            ? $appraisal->targets()->where('target_type', TargetType::Current)->get()->keyBy('id')
+            : collect();
+
+        $appraisal->targets()->where('target_type', TargetType::Current)->delete();
+
+        $number = 1;
+        foreach ($targets as $input) {
+            $isBlank = blank($input['target_text'] ?? null)
+                && blank($input['action_text'] ?? null)
+                && blank($input['success_criteria'] ?? null);
+
+            if ($isBlank) {
+                continue;
+            }
+
+            $previous = ! empty($input['id']) ? $existing->get((int) $input['id']) : null;
+
+            $appraisal->targets()->create([
+                'target_type' => TargetType::Current,
+                'target_number' => $number++,
+                'target_text' => $input['target_text'] ?? null,
+                'action_text' => $input['action_text'] ?? null,
+                'success_criteria' => $input['success_criteria'] ?? null,
+                'target_met' => $previous?->target_met,
+                'comments' => $previous?->comments,
+            ]);
+        }
     }
 
     /**

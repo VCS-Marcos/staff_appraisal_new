@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,7 +45,9 @@ class UserController extends Controller
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
 
-        User::create($data);
+        $user = User::create($data);
+
+        AuditLog::record('user.created', $user, "Created staff account: {$user->name} ({$user->role->value})");
 
         return redirect()->route('admin.users.index')->with('status', 'User created.');
     }
@@ -68,6 +71,11 @@ class UserController extends Controller
 
         $user->update($data);
 
+        $changed = array_values(array_diff(array_keys($user->getChanges()), ['updated_at']));
+
+        AuditLog::record('user.updated', $user, "Updated staff account: {$user->name}"
+            .($changed ? ' — fields: '.implode(', ', $changed) : ''));
+
         return redirect()->route('admin.users.index')->with('status', 'User updated.');
     }
 
@@ -75,7 +83,10 @@ class UserController extends Controller
     {
         $this->authorize('delete', $user);
 
+        $name = "{$user->name} ({$user->email})";
         $user->delete();
+
+        AuditLog::record('user.deleted', $user, "Deleted staff account: {$name}");
 
         return redirect()->route('admin.users.index')->with('status', 'User deleted.');
     }

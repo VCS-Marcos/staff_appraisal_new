@@ -24,7 +24,7 @@
                                    class="w-full pl-9 border-gray-300 rounded-md shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <select name="line_manager_id" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
-                            <option value="">All Users</option>
+                            <option value="">All Staff</option>
                             @foreach ($managers as $manager)
                                 <option value="{{ $manager->id }}" @selected(request('line_manager_id') == $manager->id)>{{ $manager->name }}</option>
                             @endforeach

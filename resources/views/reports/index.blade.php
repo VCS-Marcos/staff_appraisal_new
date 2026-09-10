@@ -18,6 +18,12 @@
                         <div class="font-semibold text-gray-900">Staff Ratings</div>
                         <p class="text-sm text-gray-500 mt-1">See overall ratings given across completed appraisals, by staff member and cycle.</p>
                     </a>
+
+                    <a href="{{ route('reports.audit') }}" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-sm transition">
+                        <x-icon name="lock" class="w-6 h-6 text-indigo-600 mb-2" />
+                        <div class="font-semibold text-gray-900">Activity Log</div>
+                        <p class="text-sm text-gray-500 mt-1">Full audit trail of who created, edited, deleted, submitted or signed records, and when.</p>
+                    </a>
                 @endif
 
                 <a href="{{ route('reports.pd-hours') }}" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-sm transition">

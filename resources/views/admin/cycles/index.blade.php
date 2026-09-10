@@ -14,7 +14,14 @@
                 @if (session('status'))
                     <div class="p-4 bg-green-50 text-green-700 text-sm">{{ session('status') }}</div>
                 @endif
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide p-4 pb-0">All Cycles</p>
+                <div class="flex items-center gap-3 p-4 pb-0">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        {{ request()->boolean('active') ? 'Active Cycles' : 'All Cycles' }}
+                    </p>
+                    @if (request()->boolean('active'))
+                        <a href="{{ route('admin.cycles.index') }}" class="text-xs text-indigo-600 hover:underline">Show all</a>
+                    @endif
+                </div>
                 <table class="min-w-full divide-y divide-gray-200 mt-2">
                     <thead class="bg-gray-50">
                         <tr>
@@ -41,7 +48,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-right space-x-3">
-                                    <a href="{{ route('admin.appraisals.create', ['cycle_id' => $cycle->id]) }}" class="text-indigo-600 hover:underline">Open Appraisal</a>
+                                    <a href="{{ route('admin.appraisals.create', ['cycle_id' => $cycle->id]) }}" class="text-indigo-600 hover:underline">Create Appraisal</a>
                                     <a href="{{ route('admin.cycles.edit', $cycle) }}" class="text-indigo-600 hover:underline">Edit</a>
                                     <form method="POST" action="{{ route('admin.cycles.destroy', $cycle) }}" class="inline" onsubmit="return confirm('Delete this cycle?');">
                                         @csrf

@@ -6,14 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreCycleRequest;
 use App\Http\Requests\Admin\UpdateCycleRequest;
 use App\Models\AppraisalCycle;
+use App\Models\AuditLog;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class AppraisalCycleController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $cycles = AppraisalCycle::withCount('appraisals')->orderByDesc('start_date')->paginate(20);
+        $cycles = AppraisalCycle::withCount('appraisals')
+            ->when($request->boolean('active'), fn ($q) => $q->where('is_active', true))
+            ->orderByDesc('start_date')
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.cycles.index', compact('cycles'));
     }
@@ -25,7 +31,9 @@ class AppraisalCycleController extends Controller
 
     public function store(StoreCycleRequest $request): RedirectResponse
     {
-        AppraisalCycle::create($request->validated());
+        $cycle = AppraisalCycle::create($request->validated());
+
+        AuditLog::record('cycle.created', $cycle, "Created appraisal cycle: {$cycle->name} ({$cycle->term->value})");
 
         return redirect()->route('admin.cycles.index')->with('status', 'Cycle created.');
     }
@@ -39,6 +47,8 @@ class AppraisalCycleController extends Controller
     {
         $cycle->update($request->validated());
 
+        AuditLog::record('cycle.updated', $cycle, "Updated appraisal cycle: {$cycle->name} ({$cycle->term->value})");
+
         return redirect()->route('admin.cycles.index')->with('status', 'Cycle updated.');
     }
 
@@ -46,7 +56,10 @@ class AppraisalCycleController extends Controller
     {
         $this->authorize('delete', $cycle);
 
+        $name = "{$cycle->name} ({$cycle->term->value})";
         $cycle->delete();
+
+        AuditLog::record('cycle.deleted', $cycle, "Deleted appraisal cycle: {$name}");
 
         return redirect()->route('admin.cycles.index')->with('status', 'Cycle deleted.');
     }

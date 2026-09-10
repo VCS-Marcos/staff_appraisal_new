@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Open an Appraisal') }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Create an Appraisal') }}</h2>
     </x-slot>
 
     @php
@@ -78,13 +78,18 @@
                         <button type="button" x-on:click="addTarget()" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add Target</button>
                     </div>
 
-                    <div class="flex justify-end gap-3">
+                    <div class="flex flex-wrap justify-end gap-3">
                         <a href="{{ route('admin.appraisals.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                             Cancel
                         </a>
-                        <x-primary-button>Create as Draft</x-primary-button>
+                        <button type="submit" name="intent" value="draft" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                            Save as Draft
+                        </button>
+                        <button type="submit" name="intent" value="open" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                            Save &amp; Open for Employee
+                        </button>
                     </div>
-                    <p class="text-xs text-gray-500">The appraisal is created as a draft. Use "Open for Employee" from the appraisals list when you're ready to notify them.</p>
+                    <p class="text-xs text-gray-500">"Save as Draft" keeps the appraisal hidden from the employee until you open it from the appraisals list. "Save &amp; Open for Employee" opens it immediately and notifies them.</p>
                 </form>
             </div>
         </div>

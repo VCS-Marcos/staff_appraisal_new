@@ -99,6 +99,8 @@ class AppraisalController extends Controller
             $appraisal->update(['status' => AppraisalStatus::PendingReviewer]);
             $appraisal->reviewer->notify(new AppraisalSubmittedForReview($appraisal));
 
+            AuditLog::record('appraisal.submitted_by_employee', $appraisal, 'Employee submitted their section — now awaiting reviewer');
+
             return redirect()->route('appraisals.index')->with('status', 'Appraisal submitted to your reviewer.');
         }
 
@@ -153,6 +155,8 @@ class AppraisalController extends Controller
             $appraisal->employee->notify(new AppraisalReadyForSignoff($appraisal));
             $appraisal->reviewer->notify(new AppraisalReadyForSignoff($appraisal));
 
+            AuditLog::record('appraisal.submitted_by_reviewer', $appraisal, 'Reviewer submitted the review — now awaiting sign-off');
+
             return redirect()->route('appraisals.index')->with('status', 'Review submitted, awaiting sign-off.');
         }
 
@@ -176,18 +180,14 @@ class AppraisalController extends Controller
             $isEmployee ? 'employee_signed_at' : 'reviewer_signed_at' => now(),
         ]);
 
-        AuditLog::create([
-            'user_id' => $request->user()->id,
-            'action' => 'signed',
-            'entity_type' => 'appraisal',
-            'entity_id' => $appraisal->id,
-            'ip_address' => $request->ip(),
-        ]);
+        AuditLog::record('appraisal.signed', $appraisal,
+            ($isEmployee ? 'Employee' : 'Reviewer').' signed the appraisal');
 
         $appraisal->refresh();
 
         if ($appraisal->isFullySigned()) {
             $appraisal->update(['status' => AppraisalStatus::Completed]);
+            AuditLog::record('appraisal.completed', $appraisal, 'Appraisal fully signed and marked completed');
         }
 
         return redirect()->route('appraisals.show', $appraisal)->with('status', 'Signed successfully.');
@@ -199,13 +199,8 @@ class AppraisalController extends Controller
 
         $appraisal->load(['employee', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'exported_pdf',
-            'entity_type' => 'appraisal',
-            'entity_id' => $appraisal->id,
-            'ip_address' => request()->ip(),
-        ]);
+        AuditLog::record('appraisal.exported_pdf', $appraisal,
+            "Exported PDF for {$appraisal->employee->name} ({$appraisal->cycle->name} {$appraisal->cycle->term->value})");
 
         $pdf = Pdf::loadView('appraisals.pdf', compact('appraisal'))->setPaper('a4');
 
