@@ -14,11 +14,31 @@
                     'hours' => (string) $p->hours,
                     'activity_date' => optional($p->activity_date)->format('Y-m-d'),
                 ])->values()->all();
+
+                $errorKeys = collect($errors->keys());
+                $errorTab = 'targets';
+                if ($errorKeys->contains('self_reflection')) {
+                    $errorTab = 'performance';
+                }
+                if ($errorKeys->contains(fn ($k) => str_starts_with($k, 'pd'))) {
+                    $errorTab = 'cpd';
+                }
             @endphp
 
             <x-appraisal-header :appraisal="$appraisal" />
 
-            <form method="POST" action="{{ route('appraisals.update', $appraisal) }}" class="space-y-6" x-data='{ tab: "targets", pd: @json($initialPd) }'>
+            @if ($errors->any())
+                <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 text-sm">
+                    <p class="font-semibold mb-1">Your appraisal couldn't be submitted — please fix the following:</p>
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('appraisals.update', $appraisal) }}" class="space-y-6" x-data='{ tab: "{{ $errorTab }}", pd: @json($initialPd) }'>
                 @csrf
                 @method('PUT')
 

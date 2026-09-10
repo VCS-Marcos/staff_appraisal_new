@@ -17,11 +17,31 @@
                         ])->values()->all()
                         : [['target_text' => '', 'action_text' => '', 'success_criteria' => '']]
                 );
+
+                $errorKeys = collect($errors->keys());
+                $errorTab = 'targets';
+                if ($errorKeys->contains(fn ($k) => in_array($k, ['reviewer_comments', 'overall_rating', 'appraisal_date', 'next_review_date'], true))) {
+                    $errorTab = 'performance';
+                }
+                if ($errorKeys->contains(fn ($k) => str_starts_with($k, 'next_year_targets'))) {
+                    $errorTab = 'new-targets';
+                }
             @endphp
 
             <x-appraisal-header :appraisal="$appraisal" />
 
-            <form method="POST" action="{{ route('appraisals.review.update', $appraisal) }}" class="space-y-6" x-data='{ tab: "targets", nextYearTargets: @json($initialNextYearTargets) }'>
+            @if ($errors->any())
+                <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 text-sm">
+                    <p class="font-semibold mb-1">Your review couldn't be submitted — please fix the following:</p>
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('appraisals.review.update', $appraisal) }}" class="space-y-6" x-data='{ tab: "{{ $errorTab }}", nextYearTargets: @json($initialNextYearTargets) }'>
                 @csrf
                 @method('PUT')
 
