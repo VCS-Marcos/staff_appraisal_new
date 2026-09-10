@@ -86,12 +86,8 @@
                                     <a href="{{ route('appraisals.show', $appraisal) }}" class="text-indigo-600 hover:underline">View</a>
                                     <a href="{{ route('admin.appraisals.edit', $appraisal) }}" class="text-indigo-600 hover:underline">Edit</a>
                                     <a href="{{ route('appraisals.pdf', $appraisal) }}" class="text-gray-600 hover:underline">Download</a>
-                                    <form method="POST" action="{{ route('admin.appraisals.destroy', $appraisal) }}" class="inline"
-                                          onsubmit="return confirm('Delete this appraisal for {{ addslashes($appraisal->employee->name) }}? This also removes its targets and CPD entries and cannot be undone.');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                                    </form>
+                                    <x-confirm-delete :action="route('admin.appraisals.destroy', $appraisal)"
+                                        prompt="Also removes its targets & CPD entries." />
                                 </td>
                             </tr>
                         @empty

@@ -50,11 +50,8 @@
                                 <td class="px-6 py-4 text-sm text-right space-x-3">
                                     <a href="{{ route('admin.appraisals.create', ['cycle_id' => $cycle->id]) }}" class="text-indigo-600 hover:underline">Create Appraisal</a>
                                     <a href="{{ route('admin.cycles.edit', $cycle) }}" class="text-indigo-600 hover:underline">Edit</a>
-                                    <form method="POST" action="{{ route('admin.cycles.destroy', $cycle) }}" class="inline" onsubmit="return confirm('Delete this cycle?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                                    </form>
+                                    <x-confirm-delete :action="route('admin.cycles.destroy', $cycle)"
+                                        prompt="Delete this cycle?" />
                                 </td>
                             </tr>
                         @endforeach
