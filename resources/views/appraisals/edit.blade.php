@@ -1,6 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Complete My Appraisal') }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ $actingOnBehalf ? __('Complete Appraisal — In Person') : __('Complete My Appraisal') }}
+        </h2>
     </x-slot>
 
     <div class="py-12">
@@ -23,9 +25,22 @@
                 if ($errorKeys->contains(fn ($k) => str_starts_with($k, 'pd'))) {
                     $errorTab = 'cpd';
                 }
+
+                $submitLabel = $actingOnBehalf ? 'Submit on Their Behalf' : 'Submit to Reviewer';
+                $submitPrompt = $actingOnBehalf
+                    ? "This confirms {$appraisal->employee->name}'s answers above are accurate and ready for the reviewer."
+                    : "Once submitted you can't make further changes until the reviewer responds.";
             @endphp
 
             <x-appraisal-header :appraisal="$appraisal" />
+
+            @if ($actingOnBehalf)
+                <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg">
+                    You are completing <strong>{{ $appraisal->employee->name }}'s</strong> section on their behalf
+                    during an in-person session. Go through each answer together with {{ $appraisal->employee->name }}
+                    before submitting.
+                </div>
+            @endif
 
             @if ($errors->any())
                 <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 text-sm">
@@ -50,9 +65,9 @@
                         Save Progress
                     </button>
                     <x-confirm-submit name="intent" value="submit"
-                        label="Submit to Reviewer"
+                        :label="$submitLabel"
                         confirm-label="Yes, submit"
-                        prompt="Once submitted you can't make further changes until the reviewer responds." />
+                        :prompt="$submitPrompt" />
                 </div>
 
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">

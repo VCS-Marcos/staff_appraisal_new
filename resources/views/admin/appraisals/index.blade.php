@@ -51,8 +51,14 @@
                                 <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
                             @endforeach
                         </select>
+                        <select name="completion_mode" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
+                            <option value="">All Modes</option>
+                            @foreach (\App\Enums\CompletionMode::cases() as $mode)
+                                <option value="{{ $mode->value }}" @selected(request('completion_mode') === $mode->value)>{{ $mode->label() }}</option>
+                            @endforeach
+                        </select>
                         <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50">Search</button>
-                        @if (request('search') || request('cycle_id') || request('status'))
+                        @if (request('search') || request('cycle_id') || request('status') || request('completion_mode'))
                             <a href="{{ route('admin.appraisals.index') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Clear</a>
                         @endif
                     </form>
@@ -65,6 +71,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reviewer</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cycle</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mode</th>
                             <th class="px-6 py-3"></th>
                         </tr>
                     </thead>
@@ -75,6 +82,11 @@
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->reviewer->name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</td>
                                 <td class="px-6 py-4 text-sm"><x-status-badge :status="$appraisal->status" /></td>
+                                <td class="px-6 py-4 text-sm">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $appraisal->completion_mode === \App\Enums\CompletionMode::Assisted ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700' }}">
+                                        {{ $appraisal->completion_mode->label() }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4 text-sm text-right space-x-3 whitespace-nowrap">
                                     @if ($appraisal->status === \App\Enums\AppraisalStatus::Draft)
                                         <form method="POST" action="{{ route('admin.appraisals.open', $appraisal) }}" class="inline">
@@ -92,7 +104,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">No appraisals found.</td>
+                                <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">No appraisals found.</td>
                             </tr>
                         @endforelse
                     </tbody>

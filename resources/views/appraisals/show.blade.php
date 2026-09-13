@@ -19,13 +19,18 @@
                     <x-icon name="download" class="w-3.5 h-3.5" /> PDF
                 </a>
                 @can('updateAsEmployee', $appraisal)
-                    <a href="{{ route('appraisals.edit', $appraisal) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">Complete My Section</a>
+                    <a href="{{ route('appraisals.edit', $appraisal) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                        {{ $appraisal->user_id === auth()->id() ? 'Complete My Section' : 'Complete In Person' }}
+                    </a>
                 @endcan
                 @can('updateAsReviewer', $appraisal)
                     <a href="{{ route('appraisals.review', $appraisal) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">Complete Review</a>
                 @endcan
                 @can('sign', $appraisal)
                     <a href="{{ route('appraisals.sign', $appraisal) }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-emerald-700">Sign Off</a>
+                @endcan
+                @can('signOnBehalf', $appraisal)
+                    <a href="{{ route('appraisals.sign-in-person', $appraisal) }}" class="inline-flex items-center px-4 py-2 bg-amber-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-amber-700">Complete Sign-off (In Person)</a>
                 @endcan
                 @if (auth()->user()->isAdmin() && $appraisal->status === \App\Enums\AppraisalStatus::Draft)
                     <form method="POST" action="{{ route('admin.appraisals.open', $appraisal) }}">

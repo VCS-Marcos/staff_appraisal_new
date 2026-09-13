@@ -51,7 +51,7 @@ class AppraisalController extends Controller
 
         return Response::streamDownload(function () use ($appraisals) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Employee', 'Position', 'Reviewer', 'Cycle', 'Term', 'Status', 'Overall Rating', 'Appraisal Date', 'Employee Signed', 'Reviewer Signed']);
+            fputcsv($out, ['Employee', 'Position', 'Reviewer', 'Cycle', 'Term', 'Status', 'Completion Mode', 'Overall Rating', 'Appraisal Date', 'Employee Signed', 'Reviewer Signed']);
 
             foreach ($appraisals as $appraisal) {
                 fputcsv($out, [
@@ -61,6 +61,7 @@ class AppraisalController extends Controller
                     $appraisal->cycle->name,
                     $appraisal->cycle->term->value,
                     $appraisal->status->label(),
+                    $appraisal->completion_mode->label(),
                     $appraisal->overall_rating?->value,
                     optional($appraisal->appraisal_date)->format('Y-m-d'),
                     optional($appraisal->employee_signed_at)->format('Y-m-d H:i'),
@@ -87,7 +88,8 @@ class AppraisalController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->string('search').'%';
                 $q->whereHas('employee', fn ($q2) => $q2->where('name', 'like', $term));
-            });
+            })
+            ->when($request->filled('completion_mode'), fn ($q) => $q->where('completion_mode', $request->string('completion_mode')));
     }
 
     public function create(Request $request): View

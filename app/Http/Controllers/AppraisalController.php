@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AppraisalStatus;
+use App\Enums\CompletionMode;
 use App\Enums\CycleTerm;
 use App\Enums\PdNature;
 use App\Enums\TargetType;
 use App\Http\Requests\SignAppraisalRequest;
+use App\Http\Requests\SignInPersonRequest;
 use App\Http\Requests\UpdateAppraisalEmployeeRequest;
 use App\Http\Requests\UpdateAppraisalReviewerRequest;
 use App\Models\Appraisal;
@@ -18,6 +20,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -57,15 +60,19 @@ class AppraisalController extends Controller
 
         $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'professionalDevelopment']);
 
-        return view('appraisals.edit', compact('appraisal'));
+        $actingOnBehalf = auth()->id() !== $appraisal->user_id;
+
+        return view('appraisals.edit', compact('appraisal', 'actingOnBehalf'));
     }
 
     public function update(UpdateAppraisalEmployeeRequest $request, Appraisal $appraisal): RedirectResponse
     {
         $data = $request->validated();
+        $actingAsEmployee = $request->user()->id === $appraisal->user_id;
 
         $appraisal->update([
             'self_reflection' => $data['self_reflection'] ?? $appraisal->self_reflection,
+            'completion_mode' => $actingAsEmployee ? $appraisal->completion_mode : CompletionMode::Assisted,
         ]);
 
         foreach ($data['targets'] ?? [] as $targetInput) {
@@ -99,9 +106,15 @@ class AppraisalController extends Controller
             $appraisal->update(['status' => AppraisalStatus::PendingReviewer]);
             $appraisal->reviewer->notify(new AppraisalSubmittedForReview($appraisal));
 
-            AuditLog::record('appraisal.submitted_by_employee', $appraisal, 'Employee submitted their section — now awaiting reviewer');
+            if ($actingAsEmployee) {
+                AuditLog::record('appraisal.submitted_by_employee', $appraisal, 'Employee submitted their section — now awaiting reviewer');
+            } else {
+                AuditLog::record('appraisal.submitted_on_behalf', $appraisal,
+                    "Employee's section captured in person by {$request->user()->name} on behalf of {$appraisal->employee->name} — now awaiting reviewer");
+            }
 
-            return redirect()->route('appraisals.index')->with('status', 'Appraisal submitted to your reviewer.');
+            return redirect()->route('appraisals.index')->with('status',
+                $actingAsEmployee ? 'Appraisal submitted to your reviewer.' : "Appraisal submitted on {$appraisal->employee->name}'s behalf.");
         }
 
         return redirect()->route('appraisals.edit', $appraisal)->with('status', 'Progress saved.');
@@ -191,6 +204,57 @@ class AppraisalController extends Controller
         }
 
         return redirect()->route('appraisals.show', $appraisal)->with('status', 'Signed successfully.');
+    }
+
+    public function signInPerson(Appraisal $appraisal): View
+    {
+        $this->authorize('signOnBehalf', $appraisal);
+
+        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
+
+        return view('appraisals.sign-in-person', compact('appraisal'));
+    }
+
+    public function submitSignInPerson(SignInPersonRequest $request, Appraisal $appraisal): RedirectResponse
+    {
+        $actor = $request->user();
+        $capturingEmployee = $appraisal->employee_signed_at === null;
+        $capturingReviewer = $appraisal->reviewer_signed_at === null;
+
+        DB::transaction(function () use ($appraisal, $capturingEmployee, $capturingReviewer) {
+            if ($capturingEmployee) {
+                $appraisal->employee_signed_at = now();
+            }
+
+            if ($capturingReviewer) {
+                $appraisal->reviewer_signed_at = now();
+            }
+
+            $appraisal->completion_mode = CompletionMode::Assisted;
+            $appraisal->save();
+        });
+
+        if ($capturingEmployee) {
+            AuditLog::record('appraisal.signed_in_person', $appraisal,
+                "Employee signature captured in person by {$actor->name} on behalf of {$appraisal->employee->name}");
+        }
+
+        if ($capturingReviewer) {
+            $standingIn = $appraisal->reviewer_id !== $actor->id;
+
+            AuditLog::record('appraisal.signed_in_person', $appraisal,
+                "Reviewer signature captured in person by {$actor->name}"
+                .($standingIn ? " (standing in for reviewer {$appraisal->reviewer->name})" : ''));
+        }
+
+        $appraisal->refresh();
+
+        if ($appraisal->isFullySigned()) {
+            $appraisal->update(['status' => AppraisalStatus::Completed]);
+            AuditLog::record('appraisal.completed', $appraisal, 'Appraisal fully signed and marked completed (in-person session)');
+        }
+
+        return redirect()->route('appraisals.show', $appraisal)->with('status', 'Sign-off captured successfully.');
     }
 
     public function downloadPdf(Appraisal $appraisal): Response

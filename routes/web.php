@@ -28,6 +28,8 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
         Route::put('/{appraisal}/review', [AppraisalController::class, 'updateReview'])->name('review.update');
         Route::get('/{appraisal}/sign', [AppraisalController::class, 'signOff'])->name('sign');
         Route::post('/{appraisal}/sign', [AppraisalController::class, 'submitSignOff'])->name('sign.submit');
+        Route::get('/{appraisal}/sign-in-person', [AppraisalController::class, 'signInPerson'])->name('sign-in-person');
+        Route::post('/{appraisal}/sign-in-person', [AppraisalController::class, 'submitSignInPerson'])->name('sign-in-person.submit');
         Route::get('/{appraisal}/pdf', [AppraisalController::class, 'downloadPdf'])->name('pdf');
     });
 

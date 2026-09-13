@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AppraisalStatus;
+use App\Enums\CompletionMode;
 use App\Enums\OverallRating;
 use App\Enums\TargetType;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'user_id', 'reviewer_id', 'cycle_id', 'appraisal_date',
     'self_reflection', 'reviewer_comments', 'overall_rating',
-    'next_review_date', 'status', 'employee_signed_at', 'reviewer_signed_at',
+    'next_review_date', 'status', 'completion_mode', 'employee_signed_at', 'reviewer_signed_at',
 ])]
 class Appraisal extends Model
 {
@@ -27,6 +28,7 @@ class Appraisal extends Model
             'overall_rating' => OverallRating::class,
             'next_review_date' => 'date',
             'status' => AppraisalStatus::class,
+            'completion_mode' => CompletionMode::class,
             'employee_signed_at' => 'datetime',
             'reviewer_signed_at' => 'datetime',
         ];

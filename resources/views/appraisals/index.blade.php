@@ -27,10 +27,16 @@
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $appraisal->employee->name }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</td>
                                     <td class="px-6 py-4 text-sm"><x-status-badge :status="$appraisal->status" /></td>
-                                    <td class="px-6 py-4 text-sm text-right space-x-3">
+                                    <td class="px-6 py-4 text-sm text-right space-x-3 whitespace-nowrap">
+                                        @can('updateAsEmployee', $appraisal)
+                                            <a href="{{ route('appraisals.edit', $appraisal) }}" class="text-amber-700 hover:underline">Complete In Person</a>
+                                        @endcan
                                         @if ($appraisal->status === \App\Enums\AppraisalStatus::PendingReviewer)
                                             <a href="{{ route('appraisals.review', $appraisal) }}" class="text-indigo-600 hover:underline">Review</a>
                                         @endif
+                                        @can('signOnBehalf', $appraisal)
+                                            <a href="{{ route('appraisals.sign-in-person', $appraisal) }}" class="text-amber-700 hover:underline">Complete Sign-off (In Person)</a>
+                                        @endcan
                                         <a href="{{ route('appraisals.show', $appraisal) }}" class="text-gray-600 hover:underline">View</a>
                                     </td>
                                 </tr>

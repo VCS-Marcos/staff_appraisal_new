@@ -166,6 +166,9 @@
                     </td>
                 </tr>
             </table>
+            @if ($appraisal->completion_mode === \App\Enums\CompletionMode::Assisted)
+                <p class="muted" style="margin-top: 6px;">Completion Mode: Assisted (In Person) — one or more sections/signatures were captured by the reviewer or admin during an in-person session.</p>
+            @endif
         </div>
     </div>
 

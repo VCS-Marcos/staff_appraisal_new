@@ -39,12 +39,19 @@ class AppraisalPolicy
 
     /**
      * Employee may fill in Section 1 target status/comments + Section 2 self-reflection
-     * while the appraisal is still in an employee-editable stage.
+     * while the appraisal is still in an employee-editable stage. Their reviewer or an
+     * admin may also use this same form on the employee's behalf during an in-person
+     * session, for staff without portal access.
      */
     public function updateAsEmployee(User $user, Appraisal $appraisal): bool
     {
+        if ($appraisal->status !== AppraisalStatus::PendingEmployee) {
+            return false;
+        }
+
         return $appraisal->user_id === $user->id
-            && $appraisal->status === AppraisalStatus::PendingEmployee;
+            || $appraisal->reviewer_id === $user->id
+            || $user->isAdmin();
     }
 
     /**
@@ -72,5 +79,22 @@ class AppraisalPolicy
         }
 
         return false;
+    }
+
+    /**
+     * Reviewer or admin may capture one or both signatures on an in-person "assisted"
+     * sign-off screen, for an employee who has no portal access of their own.
+     */
+    public function signOnBehalf(User $user, Appraisal $appraisal): bool
+    {
+        if ($appraisal->status !== AppraisalStatus::PendingSignoff) {
+            return false;
+        }
+
+        if ($appraisal->isFullySigned()) {
+            return false;
+        }
+
+        return $appraisal->reviewer_id === $user->id || $user->isAdmin();
     }
 }
