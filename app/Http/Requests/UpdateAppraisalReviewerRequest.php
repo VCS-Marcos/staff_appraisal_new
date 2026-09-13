@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\CycleTerm;
 use App\Enums\OverallRating;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -36,9 +35,8 @@ class UpdateAppraisalReviewerRequest extends FormRequest
     {
         $validator->after(function (Validator $validator) {
             $submitting = $this->input('intent') === 'submit';
-            $isEndOfYear = $this->route('appraisal')->cycle->term === CycleTerm::EndOfYear;
 
-            if (! $submitting || ! $isEndOfYear) {
+            if (! $submitting) {
                 return;
             }
 
@@ -46,7 +44,7 @@ class UpdateAppraisalReviewerRequest extends FormRequest
                 ->contains(fn ($target) => filled($target['target_text'] ?? null));
 
             if (! $hasAtLeastOneTarget) {
-                $validator->errors()->add('next_year_targets', 'Set at least one target for next year before submitting an end-of-year review.');
+                $validator->errors()->add('next_year_targets', 'Set at least one target for next year before submitting your review.');
             }
         });
     }

@@ -7,7 +7,6 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             @php
-                $isEndOfYear = $appraisal->cycle->term === \App\Enums\CycleTerm::EndOfYear;
                 $initialNextYearTargets = old('next_year_targets') ?? (
                     $appraisal->nextYearTargets->isNotEmpty()
                         ? $appraisal->nextYearTargets->map(fn ($t) => [
@@ -62,9 +61,7 @@
                     <div class="flex items-center gap-6 border-b border-gray-200 mb-6 overflow-x-auto">
                         <button type="button" @click="tab = 'targets'" :class="tab === 'targets' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">1 — Target Review</button>
                         <button type="button" @click="tab = 'performance'" :class="tab === 'performance' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">2 — Performance</button>
-                        @if ($isEndOfYear)
-                            <button type="button" @click="tab = 'new-targets'" :class="tab === 'new-targets' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">3 — New Targets</button>
-                        @endif
+                        <button type="button" @click="tab = 'new-targets'" :class="tab === 'new-targets' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">3 — New Targets</button>
                         <button type="button" @click="tab = 'cpd'" :class="tab === 'cpd' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">4 — CPD Log</button>
                     </div>
 
@@ -132,32 +129,30 @@
                         </div>
                     </div>
 
-                    @if ($isEndOfYear)
-                        <div x-show="tab === 'new-targets'" x-cloak>
-                            <p class="text-xs text-gray-500 mb-4">For end-of-year review only. Add a card for each target — set the target, the action to be completed, and the success criteria.</p>
-                            <x-input-error :messages="$errors->get('next_year_targets')" class="mb-3" />
+                    <div x-show="tab === 'new-targets'" x-cloak>
+                        <p class="text-xs text-gray-500 mb-4">Add a card for each target — set the target, the action to be completed, and the success criteria.</p>
+                        <x-input-error :messages="$errors->get('next_year_targets')" class="mb-3" />
 
-                            <div class="space-y-4">
-                                <template x-for="(t, index) in nextYearTargets" :key="index">
-                                    <div class="border border-gray-200 rounded-md p-4">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <label class="block text-sm font-medium text-gray-700" x-text="'Target ' + (index + 1)"></label>
-                                            <button type="button" x-show="nextYearTargets.length > 1" x-on:click="nextYearTargets.splice(index, 1)" class="text-xs text-red-600 hover:underline">Remove</button>
-                                        </div>
-                                        <textarea :name="'next_year_targets[' + index + '][target_text]'" x-model="t.target_text" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Target"></textarea>
-
-                                        <label class="block text-sm font-medium text-gray-700 mt-3">Action to be Completed</label>
-                                        <textarea :name="'next_year_targets[' + index + '][action_text]'" x-model="t.action_text" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
-
-                                        <label class="block text-sm font-medium text-gray-700 mt-3">Success Criteria</label>
-                                        <textarea :name="'next_year_targets[' + index + '][success_criteria]'" x-model="t.success_criteria" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                        <div class="space-y-4">
+                            <template x-for="(t, index) in nextYearTargets" :key="index">
+                                <div class="border border-gray-200 rounded-md p-4">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-sm font-medium text-gray-700" x-text="'Target ' + (index + 1)"></label>
+                                        <button type="button" x-show="nextYearTargets.length > 1" x-on:click="nextYearTargets.splice(index, 1)" class="text-xs text-red-600 hover:underline">Remove</button>
                                     </div>
-                                </template>
-                            </div>
+                                    <textarea :name="'next_year_targets[' + index + '][target_text]'" x-model="t.target_text" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Target"></textarea>
 
-                            <button type="button" x-on:click="nextYearTargets.push({ target_text: '', action_text: '', success_criteria: '' })" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add Target</button>
+                                    <label class="block text-sm font-medium text-gray-700 mt-3">Action to be Completed</label>
+                                    <textarea :name="'next_year_targets[' + index + '][action_text]'" x-model="t.action_text" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+
+                                    <label class="block text-sm font-medium text-gray-700 mt-3">Success Criteria</label>
+                                    <textarea :name="'next_year_targets[' + index + '][success_criteria]'" x-model="t.success_criteria" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                </div>
+                            </template>
                         </div>
-                    @endif
+
+                        <button type="button" x-on:click="nextYearTargets.push({ target_text: '', action_text: '', success_criteria: '' })" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add Target</button>
+                    </div>
 
                     <div x-show="tab === 'cpd'" x-cloak>
                         <p class="text-xs text-gray-500 mb-4">Professional development activities logged by the employee for this cycle.</p>

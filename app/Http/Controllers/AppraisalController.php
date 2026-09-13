@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\AppraisalStatus;
 use App\Enums\CompletionMode;
-use App\Enums\CycleTerm;
 use App\Enums\PdNature;
 use App\Enums\TargetType;
 use App\Http\Requests\SignAppraisalRequest;
@@ -140,27 +139,25 @@ class AppraisalController extends Controller
             'next_review_date' => $data['next_review_date'] ?? $appraisal->next_review_date,
         ]);
 
-        if ($appraisal->cycle->term === CycleTerm::EndOfYear) {
-            $appraisal->targets()->where('target_type', TargetType::NextYear)->delete();
+        $appraisal->targets()->where('target_type', TargetType::NextYear)->delete();
 
-            $number = 1;
-            foreach (($data['next_year_targets'] ?? []) as $targetInput) {
-                $isBlank = blank($targetInput['target_text'] ?? null)
-                    && blank($targetInput['action_text'] ?? null)
-                    && blank($targetInput['success_criteria'] ?? null);
+        $number = 1;
+        foreach (($data['next_year_targets'] ?? []) as $targetInput) {
+            $isBlank = blank($targetInput['target_text'] ?? null)
+                && blank($targetInput['action_text'] ?? null)
+                && blank($targetInput['success_criteria'] ?? null);
 
-                if ($isBlank) {
-                    continue;
-                }
-
-                $appraisal->targets()->create([
-                    'target_type' => TargetType::NextYear,
-                    'target_number' => $number++,
-                    'target_text' => $targetInput['target_text'] ?? null,
-                    'action_text' => $targetInput['action_text'] ?? null,
-                    'success_criteria' => $targetInput['success_criteria'] ?? null,
-                ]);
+            if ($isBlank) {
+                continue;
             }
+
+            $appraisal->targets()->create([
+                'target_type' => TargetType::NextYear,
+                'target_number' => $number++,
+                'target_text' => $targetInput['target_text'] ?? null,
+                'action_text' => $targetInput['action_text'] ?? null,
+                'success_criteria' => $targetInput['success_criteria'] ?? null,
+            ]);
         }
 
         if ($request->input('intent') === 'submit') {
