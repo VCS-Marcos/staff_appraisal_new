@@ -61,12 +61,15 @@
                                         {{ $user->is_active ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right space-x-3">
-                                    <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:underline">Edit</a>
-                                    @if ($user->id !== auth()->id())
-                                        <x-confirm-delete :action="route('admin.users.destroy', $user)"
-                                            prompt="Delete this staff account?" />
-                                    @endif
+                                <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
+                                    <x-action-menu>
+                                        <x-action-menu.item :href="route('admin.users.edit', $user)" icon="pencil">Edit</x-action-menu.item>
+                                        @if ($user->id !== auth()->id())
+                                            <div class="my-1 border-t border-gray-100"></div>
+                                            <x-confirm-delete menu-item :action="route('admin.users.destroy', $user)"
+                                                prompt="Delete this staff account?" />
+                                        @endif
+                                    </x-action-menu>
                                 </td>
                             </tr>
                         @empty

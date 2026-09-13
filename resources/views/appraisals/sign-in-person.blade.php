@@ -30,7 +30,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <h2 class="text-base font-bold text-gray-800 mb-4">Capture Signatures In Person</h2>
 
-                <form method="POST" action="{{ route('appraisals.sign-in-person.submit', $appraisal) }}" class="space-y-4">
+                <form id="sign-in-person-form" method="POST" action="{{ route('appraisals.sign-in-person.submit', $appraisal) }}" class="space-y-4">
                     @csrf
 
                     @if ($appraisal->employee_signed_at === null)
@@ -62,7 +62,7 @@
                     <x-input-error :messages="$errors->get('confirm_in_person')" class="mt-2" />
 
                     <div class="flex justify-end">
-                        <x-confirm-submit label="Complete Sign-off"
+                        <x-confirm-submit form="sign-in-person-form" label="Complete Sign-off"
                             confirm-label="Yes, complete sign-off"
                             prompt="This finalizes the signature(s) captured in person and cannot be undone." />
                     </div>

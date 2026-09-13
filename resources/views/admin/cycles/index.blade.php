@@ -47,11 +47,14 @@
                                         {{ $cycle->is_active ? 'Active' : 'Closed' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right space-x-3">
-                                    <a href="{{ route('admin.appraisals.create', ['cycle_id' => $cycle->id]) }}" class="text-indigo-600 hover:underline">Create Appraisal</a>
-                                    <a href="{{ route('admin.cycles.edit', $cycle) }}" class="text-indigo-600 hover:underline">Edit</a>
-                                    <x-confirm-delete :action="route('admin.cycles.destroy', $cycle)"
-                                        prompt="Delete this cycle?" />
+                                <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
+                                    <x-action-menu>
+                                        <x-action-menu.item :href="route('admin.appraisals.create', ['cycle_id' => $cycle->id])" icon="plus">Create Appraisal</x-action-menu.item>
+                                        <x-action-menu.item :href="route('admin.cycles.edit', $cycle)" icon="pencil">Edit</x-action-menu.item>
+                                        <div class="my-1 border-t border-gray-100"></div>
+                                        <x-confirm-delete menu-item :action="route('admin.cycles.destroy', $cycle)"
+                                            prompt="Delete this cycle?" />
+                                    </x-action-menu>
                                 </td>
                             </tr>
                         @endforeach

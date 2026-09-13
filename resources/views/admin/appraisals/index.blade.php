@@ -87,22 +87,23 @@
                                         {{ $appraisal->completion_mode->label() }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right space-x-3 whitespace-nowrap">
-                                    @if ($appraisal->status === \App\Enums\AppraisalStatus::Draft)
-                                        <form method="POST" action="{{ route('admin.appraisals.open', $appraisal) }}" class="inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="text-green-700 hover:underline">Open for Employee</button>
-                                        </form>
-                                    @endif
-                                    <a href="{{ route('appraisals.show', $appraisal) }}" class="text-indigo-600 hover:underline">View</a>
-                                    <a href="{{ route('admin.appraisals.edit', $appraisal) }}" class="text-indigo-600 hover:underline">Edit</a>
-                                    @can('reopen', $appraisal)
-                                        <a href="{{ route('admin.appraisals.reopen', $appraisal) }}" class="text-amber-700 hover:underline">Send Back</a>
-                                    @endcan
-                                    <a href="{{ route('appraisals.pdf', $appraisal) }}" class="text-gray-600 hover:underline">Download</a>
-                                    <x-confirm-delete :action="route('admin.appraisals.destroy', $appraisal)"
-                                        prompt="Also removes its targets & CPD entries." />
+                                <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
+                                    <x-action-menu>
+                                        @if ($appraisal->status === \App\Enums\AppraisalStatus::Draft)
+                                            <x-action-menu.form-item :action="route('admin.appraisals.open', $appraisal)" method="PATCH" icon="unlock" variant="success">
+                                                Open for Employee
+                                            </x-action-menu.form-item>
+                                        @endif
+                                        <x-action-menu.item :href="route('appraisals.show', $appraisal)" icon="eye">View</x-action-menu.item>
+                                        <x-action-menu.item :href="route('admin.appraisals.edit', $appraisal)" icon="pencil">Edit</x-action-menu.item>
+                                        @can('reopen', $appraisal)
+                                            <x-action-menu.item :href="route('admin.appraisals.reopen', $appraisal)" icon="arrow-uturn-left" variant="warning">Send Back</x-action-menu.item>
+                                        @endcan
+                                        <x-action-menu.item :href="route('appraisals.pdf', $appraisal)" icon="download">Download</x-action-menu.item>
+                                        <div class="my-1 border-t border-gray-100"></div>
+                                        <x-confirm-delete menu-item :action="route('admin.appraisals.destroy', $appraisal)"
+                                            prompt="Also removes its targets & CPD entries." />
+                                    </x-action-menu>
                                 </td>
                             </tr>
                         @empty

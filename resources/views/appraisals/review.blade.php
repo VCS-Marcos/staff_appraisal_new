@@ -40,7 +40,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('appraisals.review.update', $appraisal) }}" class="space-y-6" x-data='{ tab: "{{ $errorTab }}", nextYearTargets: @json($initialNextYearTargets) }'>
+            <form id="review-form" method="POST" action="{{ route('appraisals.review.update', $appraisal) }}" class="space-y-6" x-data='{ tab: "{{ $errorTab }}", nextYearTargets: @json($initialNextYearTargets) }'>
                 @csrf
                 @method('PUT')
 
@@ -51,7 +51,7 @@
                     <button type="submit" name="intent" value="save" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                         Save Progress
                     </button>
-                    <x-confirm-submit name="intent" value="submit"
+                    <x-confirm-submit form="review-form" name="intent" value="submit"
                         label="Submit for Sign-off"
                         confirm-label="Yes, submit"
                         prompt="Move to sign-off? You won't be able to edit after this." />

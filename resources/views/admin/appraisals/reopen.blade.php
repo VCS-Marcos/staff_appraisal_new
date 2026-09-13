@@ -34,7 +34,7 @@
                     <p class="text-sm text-gray-500">This appraisal is at a stage that can't be sent back.</p>
                     <a href="{{ route('admin.appraisals.index') }}" class="inline-flex items-center mt-4 px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">Back</a>
                 @else
-                    <form method="POST" action="{{ route('admin.appraisals.reopen.submit', $appraisal) }}" class="space-y-4">
+                    <form id="reopen-form" method="POST" action="{{ route('admin.appraisals.reopen.submit', $appraisal) }}" class="space-y-4">
                         @csrf
                         @method('PATCH')
 
@@ -59,7 +59,7 @@
                             <a href="{{ route('admin.appraisals.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                                 Cancel
                             </a>
-                            <x-confirm-submit label="Send Back" confirm-label="Yes, send it back"
+                            <x-confirm-submit form="reopen-form" label="Send Back" confirm-label="Yes, send it back"
                                 prompt="This clears any existing signatures and notifies the employee or reviewer that it's reopened." />
                         </div>
                     </form>

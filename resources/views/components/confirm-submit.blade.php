@@ -4,24 +4,40 @@
     'confirmLabel' => 'Confirm',
     'name' => null,
     'value' => null,
+    'form' => null,
 ])
 
 @php
     $btnClass = 'inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700';
 @endphp
 
-<span x-data="{ confirming: false }" class="inline-flex items-center gap-2">
-    <button type="button" x-show="!confirming" x-on:click="confirming = true" class="{{ $btnClass }}">
+<div x-data="{ open: false }" class="inline-flex">
+    <button type="button" @click="open = true" class="{{ $btnClass }}">
         {{ $label }}
     </button>
 
-    <span x-show="confirming" x-cloak class="inline-flex flex-wrap items-center gap-2">
-        <span class="text-xs text-gray-500">{{ $prompt }}</span>
-        <button type="submit" @if ($name) name="{{ $name }}" @endif @if ($value !== null) value="{{ $value }}" @endif class="{{ $btnClass }}">
-            {{ $confirmLabel }}
-        </button>
-        <button type="button" x-on:click="confirming = false" class="px-2 py-2 text-xs font-medium text-gray-500 hover:text-gray-700">
-            Cancel
-        </button>
-    </span>
-</span>
+    <template x-teleport="body">
+        <div x-show="open" x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50"
+             @click.self="open = false"
+             @keydown.escape.window="open = false"
+             style="display: none;">
+            <div x-show="open" x-transition class="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
+                <h3 class="text-sm font-semibold text-gray-900">{{ $label }}?</h3>
+                <p class="text-sm text-gray-500 mt-2">{{ $prompt }}</p>
+                <div class="mt-5 flex justify-end gap-2">
+                    <button type="button" @click="open = false" class="px-4 py-2 text-xs font-semibold text-gray-600 uppercase tracking-widest rounded-md border border-gray-300 hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        @if ($form) form="{{ $form }}" @endif
+                        @if ($name) name="{{ $name }}" @endif
+                        @if ($value !== null) value="{{ $value }}" @endif
+                        class="{{ $btnClass }}">
+                        {{ $confirmLabel }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>

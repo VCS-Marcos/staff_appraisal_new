@@ -120,4 +120,33 @@
             <path d="M8.3 12.3 10.8 14.8 15.7 9.7" />
         </svg>
         @break
+
+    @case('dots-vertical')
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {{ $attributes->merge(['class' => $classes]) }}>
+            <circle cx="12" cy="5" r="1.8" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.8" fill="currentColor" />
+            <circle cx="12" cy="19" r="1.8" fill="currentColor" />
+        </svg>
+        @break
+
+    @case('eye')
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" {{ $attributes->merge(['class' => $classes]) }}>
+            <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+            <circle cx="12" cy="12" r="2.6" />
+        </svg>
+        @break
+
+    @case('arrow-uturn-left')
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" {{ $attributes->merge(['class' => $classes]) }}>
+            <path d="M7 10 3.5 6.5 7 3" />
+            <path d="M3.5 6.5h10a6 6 0 0 1 0 12H9" />
+        </svg>
+        @break
+
+    @case('unlock')
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" {{ $attributes->merge(['class' => $classes]) }}>
+            <rect x="5" y="10.5" width="14" height="9.5" rx="1.5" />
+            <path d="M8 10.5V7.5a4 4 0 0 1 7.5-2" />
+        </svg>
+        @break
 @endswitch

@@ -27,17 +27,19 @@
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $appraisal->employee->name }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</td>
                                     <td class="px-6 py-4 text-sm"><x-status-badge :status="$appraisal->status" /></td>
-                                    <td class="px-6 py-4 text-sm text-right space-x-3 whitespace-nowrap">
-                                        @can('updateAsEmployee', $appraisal)
-                                            <a href="{{ route('appraisals.edit', $appraisal) }}" class="text-amber-700 hover:underline">Complete In Person</a>
-                                        @endcan
-                                        @if ($appraisal->status === \App\Enums\AppraisalStatus::PendingReviewer)
-                                            <a href="{{ route('appraisals.review', $appraisal) }}" class="text-indigo-600 hover:underline">Review</a>
-                                        @endif
-                                        @can('signOnBehalf', $appraisal)
-                                            <a href="{{ route('appraisals.sign-in-person', $appraisal) }}" class="text-amber-700 hover:underline">Complete Sign-off (In Person)</a>
-                                        @endcan
-                                        <a href="{{ route('appraisals.show', $appraisal) }}" class="text-gray-600 hover:underline">View</a>
+                                    <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
+                                        <x-action-menu>
+                                            @can('updateAsEmployee', $appraisal)
+                                                <x-action-menu.item :href="route('appraisals.edit', $appraisal)" icon="pencil" variant="warning">Complete In Person</x-action-menu.item>
+                                            @endcan
+                                            @if ($appraisal->status === \App\Enums\AppraisalStatus::PendingReviewer)
+                                                <x-action-menu.item :href="route('appraisals.review', $appraisal)" icon="pencil">Review</x-action-menu.item>
+                                            @endif
+                                            @can('signOnBehalf', $appraisal)
+                                                <x-action-menu.item :href="route('appraisals.sign-in-person', $appraisal)" icon="check-circle" variant="warning">Complete Sign-off (In Person)</x-action-menu.item>
+                                            @endcan
+                                            <x-action-menu.item :href="route('appraisals.show', $appraisal)" icon="eye">View</x-action-menu.item>
+                                        </x-action-menu>
                                     </td>
                                 </tr>
                             @endforeach
