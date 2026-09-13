@@ -97,4 +97,18 @@ class AppraisalPolicy
 
         return $appraisal->reviewer_id === $user->id || $user->isAdmin();
     }
+
+    /**
+     * Admin may send an appraisal back to an earlier stage (e.g. to let the employee
+     * or reviewer correct a mistake after submitting). Not available while still
+     * Draft or Awaiting Employee — there's nothing to send back from there.
+     */
+    public function reopen(User $user, Appraisal $appraisal): bool
+    {
+        if (! $user->isAdmin()) {
+            return false;
+        }
+
+        return ! in_array($appraisal->status, [AppraisalStatus::Draft, AppraisalStatus::PendingEmployee], true);
+    }
 }

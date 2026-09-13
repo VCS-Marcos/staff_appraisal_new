@@ -61,6 +61,8 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
         Route::put('appraisals/{appraisal}', [AdminAppraisalController::class, 'update'])->name('appraisals.update');
         Route::delete('appraisals/{appraisal}', [AdminAppraisalController::class, 'destroy'])->name('appraisals.destroy');
         Route::patch('appraisals/{appraisal}/open', [AdminAppraisalController::class, 'open'])->name('appraisals.open');
+        Route::get('appraisals/{appraisal}/reopen', [AdminAppraisalController::class, 'showReopen'])->name('appraisals.reopen');
+        Route::patch('appraisals/{appraisal}/reopen', [AdminAppraisalController::class, 'reopen'])->name('appraisals.reopen.submit');
     });
 });
 

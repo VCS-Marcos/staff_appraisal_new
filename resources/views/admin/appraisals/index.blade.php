@@ -97,6 +97,9 @@
                                     @endif
                                     <a href="{{ route('appraisals.show', $appraisal) }}" class="text-indigo-600 hover:underline">View</a>
                                     <a href="{{ route('admin.appraisals.edit', $appraisal) }}" class="text-indigo-600 hover:underline">Edit</a>
+                                    @can('reopen', $appraisal)
+                                        <a href="{{ route('admin.appraisals.reopen', $appraisal) }}" class="text-amber-700 hover:underline">Send Back</a>
+                                    @endcan
                                     <a href="{{ route('appraisals.pdf', $appraisal) }}" class="text-gray-600 hover:underline">Download</a>
                                     <x-confirm-delete :action="route('admin.appraisals.destroy', $appraisal)"
                                         prompt="Also removes its targets & CPD entries." />

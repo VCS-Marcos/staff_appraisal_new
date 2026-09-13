@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\AppraisalStatus;
 use App\Enums\TargetType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ReopenAppraisalRequest;
 use App\Http\Requests\Admin\StoreAppraisalRequest;
 use App\Http\Requests\Admin\UpdateAppraisalRequest;
 use App\Models\Appraisal;
@@ -12,6 +13,7 @@ use App\Models\AppraisalCycle;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Notifications\AppraisalOpened;
+use App\Notifications\AppraisalSubmittedForReview;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -209,6 +211,46 @@ class AppraisalController extends Controller
         }
 
         return redirect()->back()->with('status', 'Appraisal opened for employee.');
+    }
+
+    public function showReopen(Appraisal $appraisal): View
+    {
+        $this->authorize('reopen', $appraisal);
+
+        $appraisal->load(['employee', 'reviewer', 'cycle']);
+
+        return view('admin.appraisals.reopen', compact('appraisal'));
+    }
+
+    public function reopen(ReopenAppraisalRequest $request, Appraisal $appraisal): RedirectResponse
+    {
+        $data = $request->validated();
+        $fromStatus = $appraisal->status;
+        $toStatus = AppraisalStatus::from($data['target_status']);
+        $hadSignature = $appraisal->employee_signed_at !== null || $appraisal->reviewer_signed_at !== null;
+
+        $appraisal->update([
+            'status' => $toStatus,
+            'employee_signed_at' => null,
+            'reviewer_signed_at' => null,
+        ]);
+
+        $appraisal->load(['employee', 'reviewer']);
+
+        if ($toStatus === AppraisalStatus::PendingEmployee) {
+            $appraisal->employee->notify(new AppraisalOpened($appraisal));
+        } else {
+            $appraisal->reviewer->notify(new AppraisalSubmittedForReview($appraisal));
+        }
+
+        AuditLog::record('appraisal.reopened', $appraisal, sprintf(
+            'Sent back from %s to %s by %s — reason: %s%s',
+            $fromStatus->label(), $toStatus->label(), $request->user()->name, $data['reason'],
+            $hadSignature ? ' (existing signature(s) cleared)' : '',
+        ));
+
+        return redirect()->route('admin.appraisals.index')
+            ->with('status', "Appraisal sent back to {$toStatus->label()}.");
     }
 
     /**
