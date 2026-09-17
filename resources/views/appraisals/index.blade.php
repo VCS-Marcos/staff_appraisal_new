@@ -35,6 +35,9 @@
                                             @if ($appraisal->status === \App\Enums\AppraisalStatus::PendingReviewer)
                                                 <x-action-menu.item :href="route('appraisals.review', $appraisal)" icon="pencil">Review</x-action-menu.item>
                                             @endif
+                                            @can('sign', $appraisal)
+                                                <x-action-menu.item :href="route('appraisals.sign', $appraisal)" icon="check-circle" variant="success">Sign Off</x-action-menu.item>
+                                            @endcan
                                             @can('signOnBehalf', $appraisal)
                                                 <x-action-menu.item :href="route('appraisals.sign-in-person', $appraisal)" icon="check-circle" variant="warning">Complete Sign-off (In Person)</x-action-menu.item>
                                             @endcan
@@ -67,6 +70,9 @@
                                     @if ($appraisal->status === \App\Enums\AppraisalStatus::PendingEmployee)
                                         <a href="{{ route('appraisals.edit', $appraisal) }}" class="text-indigo-600 hover:underline">Complete</a>
                                     @endif
+                                    @can('sign', $appraisal)
+                                        <a href="{{ route('appraisals.sign', $appraisal) }}" class="text-emerald-600 hover:underline">Sign Off</a>
+                                    @endcan
                                     <a href="{{ route('appraisals.show', $appraisal) }}" class="text-gray-600 hover:underline">View</a>
                                 </td>
                             </tr>
