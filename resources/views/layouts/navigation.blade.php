@@ -24,7 +24,7 @@
             <div class="hidden sm:flex items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
                     <x-icon name="user-circle" class="w-3.5 h-3.5" />
-                    {{ ucfirst(Auth::user()->role->value) }}
+                    {{ Auth::user()->name }} &middot; {{ ucfirst(Auth::user()->role->value) }}
                 </span>
 
                 <a href="{{ route('profile.edit') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-600 hover:bg-gray-50 transition">
