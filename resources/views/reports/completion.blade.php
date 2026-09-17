@@ -17,10 +17,10 @@
                 <div class="p-4 border-b border-gray-100">
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Appraisal Completion</p>
                     <form method="GET" class="flex gap-3">
-                        <select name="cycle_id" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
-                            <option value="">All Cycles</option>
-                            @foreach ($cycles as $cycle)
-                                <option value="{{ $cycle->id }}" @selected(request('cycle_id') == $cycle->id)>{{ $cycle->name }} ({{ $cycle->term->value }})</option>
+                        <select name="year" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
+                            <option value="">All Years</option>
+                            @foreach ($years as $year)
+                                <option value="{{ $year }}" @selected(request('year') == $year)>{{ $year }}</option>
                             @endforeach
                         </select>
                     </form>
@@ -29,7 +29,7 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cycle</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Draft</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Awaiting Employee</th>
@@ -45,7 +45,7 @@
                                 $percent = $row->total > 0 ? round($row->completed / $row->total * 100) : 0;
                             @endphp
                             <tr>
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $row->cycle_name }} &middot; {{ $row->cycle_term }}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $row->year }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $row->total }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $row->draft }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $row->pending_employee }}</td>
@@ -63,7 +63,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">No appraisal cycles found.</td>
+                                <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">No appraisals found.</td>
                             </tr>
                         @endforelse
                     </tbody>

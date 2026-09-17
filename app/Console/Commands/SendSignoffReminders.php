@@ -16,7 +16,7 @@ class SendSignoffReminders extends Command
     public function handle(): int
     {
         $appraisals = Appraisal::where('status', AppraisalStatus::PendingSignoff)
-            ->with(['employee', 'reviewer', 'cycle'])
+            ->with(['employee', 'reviewer'])
             ->get();
 
         $sent = 0;

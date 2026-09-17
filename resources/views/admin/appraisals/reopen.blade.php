@@ -19,7 +19,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <div class="mb-4">
                     <div class="font-semibold text-gray-900">{{ $appraisal->employee->name }}</div>
-                    <div class="text-sm text-gray-500">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }} &middot; currently <strong>{{ $appraisal->status->label() }}</strong></div>
+                    <div class="text-sm text-gray-500">{{ $appraisal->year }} &middot; currently <strong>{{ $appraisal->status->label() }}</strong></div>
                 </div>
 
                 @if ($hasSignature)

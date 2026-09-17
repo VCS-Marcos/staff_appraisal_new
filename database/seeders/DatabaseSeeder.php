@@ -3,11 +3,9 @@
 namespace Database\Seeders;
 
 use App\Enums\AppraisalStatus;
-use App\Enums\CycleTerm;
 use App\Enums\TargetType;
 use App\Enums\UserRole;
 use App\Models\Appraisal;
-use App\Models\AppraisalCycle;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -58,18 +56,10 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        $cycle = AppraisalCycle::create([
-            'name' => '2025-2026',
-            'term' => CycleTerm::EndOfYear,
-            'start_date' => '2025-09-01',
-            'end_date' => '2026-06-30',
-            'is_active' => true,
-        ]);
-
         $appraisal = Appraisal::create([
             'user_id' => $employee->id,
             'reviewer_id' => $reviewer->id,
-            'cycle_id' => $cycle->id,
+            'year' => now()->year,
             'status' => AppraisalStatus::PendingEmployee,
         ]);
 

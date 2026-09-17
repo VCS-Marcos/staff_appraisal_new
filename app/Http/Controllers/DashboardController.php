@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\AppraisalStatus;
 use App\Models\Appraisal;
-use App\Models\AppraisalCycle;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -16,14 +15,14 @@ class DashboardController extends Controller
         $user = $request->user();
 
         $data = [
-            'myAppraisals' => Appraisal::with('cycle')
+            'myAppraisals' => Appraisal::query()
                 ->where('user_id', $user->id)
                 ->orderByDesc('created_at')
                 ->get(),
         ];
 
         if ($user->isReviewer()) {
-            $data['teamAppraisals'] = Appraisal::with(['employee', 'cycle'])
+            $data['teamAppraisals'] = Appraisal::with('employee')
                 ->where('reviewer_id', $user->id)
                 ->orderByDesc('created_at')
                 ->get();
@@ -32,7 +31,7 @@ class DashboardController extends Controller
         if ($user->isAdmin()) {
             $data['stats'] = [
                 'users' => User::count(),
-                'active_cycles' => AppraisalCycle::where('is_active', true)->count(),
+                'current_year' => now()->year,
                 'draft' => Appraisal::where('status', AppraisalStatus::Draft)->count(),
                 'pending_employee' => Appraisal::where('status', AppraisalStatus::PendingEmployee)->count(),
                 'pending_reviewer' => Appraisal::where('status', AppraisalStatus::PendingReviewer)->count(),

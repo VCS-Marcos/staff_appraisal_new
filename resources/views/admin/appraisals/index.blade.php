@@ -38,10 +38,10 @@
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by staff name..."
                                    class="w-full pl-9 border-gray-300 rounded-md shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
-                        <select name="cycle_id" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
-                            <option value="">All Cycles</option>
-                            @foreach ($cycles as $cycle)
-                                <option value="{{ $cycle->id }}" @selected(request('cycle_id') == $cycle->id)>{{ $cycle->name }} ({{ $cycle->term->value }})</option>
+                        <select name="year" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
+                            <option value="">All Years</option>
+                            @foreach ($years as $year)
+                                <option value="{{ $year }}" @selected(request('year') == $year)>{{ $year }}</option>
                             @endforeach
                         </select>
                         <select name="status" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
@@ -58,7 +58,7 @@
                             @endforeach
                         </select>
                         <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50">Search</button>
-                        @if (request('search') || request('cycle_id') || request('status') || request('completion_mode'))
+                        @if (request('search') || request('year') || request('status') || request('completion_mode'))
                             <a href="{{ route('admin.appraisals.index') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Clear</a>
                         @endif
                     </form>
@@ -69,7 +69,7 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reviewer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cycle</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mode</th>
                             <th class="px-6 py-3"></th>
@@ -80,7 +80,7 @@
                             <tr>
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $appraisal->employee->name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->reviewer->name }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->year }}</td>
                                 <td class="px-6 py-4 text-sm"><x-status-badge :status="$appraisal->status" /></td>
                                 <td class="px-6 py-4 text-sm">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $appraisal->completion_mode === \App\Enums\CompletionMode::Assisted ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700' }}">

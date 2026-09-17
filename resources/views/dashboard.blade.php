@@ -18,9 +18,9 @@
                         <div class="text-2xl font-bold text-gray-800">{{ $stats['users'] }}</div>
                         <div class="text-sm text-gray-500">Staff Accounts</div>
                     </a>
-                    <a href="{{ route('admin.cycles.index', ['active' => 1]) }}" class="{{ $cardBase }}">
-                        <div class="text-2xl font-bold text-indigo-600">{{ $stats['active_cycles'] }}</div>
-                        <div class="text-sm text-gray-500">Active Cycles</div>
+                    <a href="{{ route('admin.appraisals.index', ['year' => $stats['current_year']]) }}" class="{{ $cardBase }}">
+                        <div class="text-2xl font-bold text-indigo-600">{{ $stats['current_year'] }}</div>
+                        <div class="text-sm text-gray-500">Current Year</div>
                     </a>
                     <a href="{{ route('admin.appraisals.index', ['status' => 'in_progress']) }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-amber-600">{{ $stats['pending_employee'] + $stats['pending_reviewer'] + $stats['pending_signoff'] }}</div>
@@ -38,11 +38,11 @@
                         <a href="{{ route('admin.appraisals.create') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
                             <x-icon name="plus" class="w-4 h-4" /> Create an appraisal
                         </a>
-                        <a href="{{ route('admin.cycles.create') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
-                            <x-icon name="plus" class="w-4 h-4" /> Create a cycle
-                        </a>
                         <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
                             <x-icon name="plus" class="w-4 h-4" /> Add a staff account
+                        </a>
+                        <a href="{{ route('admin.users.import') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
+                            <x-icon name="upload" class="w-4 h-4" /> Import staff from CSV
                         </a>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                             <div class="py-3 flex items-center justify-between">
                                 <div>
                                     <div class="font-medium text-gray-800">{{ $appraisal->employee->name }}</div>
-                                    <div class="text-sm text-gray-500">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</div>
+                                    <div class="text-sm text-gray-500">{{ $appraisal->year }}</div>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <x-status-badge :status="$appraisal->status" />
@@ -96,7 +96,7 @@
                         @foreach ($myAppraisals as $appraisal)
                             <div class="py-3 flex items-center justify-between">
                                 <div>
-                                    <div class="font-medium text-gray-800">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</div>
+                                    <div class="font-medium text-gray-800">{{ $appraisal->year }}</div>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <x-status-badge :status="$appraisal->status" />

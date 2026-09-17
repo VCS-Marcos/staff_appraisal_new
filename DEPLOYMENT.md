@@ -173,7 +173,7 @@ If your host runs PHP under a different user than your FTP/SSH user, you may nee
 
 - [ ] Visit the site over `https://` — confirm no mixed-content warnings, login page loads
 - [ ] Log in as your real admin account (not a seeded demo account)
-- [ ] Create a cycle, create/open one test appraisal, walk it through to completion
+- [ ] Create/open one test appraisal, walk it through to completion
       (this exercises DB writes, notifications, and PDF generation in one pass)
 - [ ] Confirm a real email arrives (not just logged) — check spam folder the first time
 - [ ] Download a PDF and confirm it renders correctly (dompdf needs the `gd` extension;

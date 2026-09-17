@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ImportUsersRequest;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Services\UserCsvImporter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Response;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -89,5 +92,31 @@ class UserController extends Controller
         AuditLog::record('user.deleted', $user, "Deleted staff account: {$name}");
 
         return redirect()->route('admin.users.index')->with('status', 'User deleted.');
+    }
+
+    public function showImport(): View
+    {
+        $this->authorize('create', User::class);
+
+        return view('admin.users.import');
+    }
+
+    public function import(ImportUsersRequest $request, UserCsvImporter $importer): View
+    {
+        $results = $importer->import($request->file('file')->getRealPath());
+
+        return view('admin.users.import-results', compact('results'));
+    }
+
+    public function downloadTemplate(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $this->authorize('create', User::class);
+
+        return Response::streamDownload(function () {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, UserCsvImporter::EXPECTED_HEADERS);
+            fputcsv($out, ['Jane Doe', 'jane.doe@example.com', 'employee', 'Class Teacher', 'john.smith@example.com', 'yes']);
+            fclose($out);
+        }, 'staff-import-template.csv', ['Content-Type' => 'text/csv']);
     }
 }

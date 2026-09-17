@@ -66,7 +66,7 @@
                     </div>
 
                     <div x-show="tab === 'targets'">
-                        <p class="text-xs text-gray-500 mb-4">Employee's responses for this cycle.</p>
+                        <p class="text-xs text-gray-500 mb-4">Employee's responses for this appraisal.</p>
                         <div class="space-y-4">
                             @foreach ($appraisal->currentTargets as $target)
                                 <div class="border border-gray-200 rounded-md p-4">
@@ -155,7 +155,7 @@
                     </div>
 
                     <div x-show="tab === 'cpd'" x-cloak>
-                        <p class="text-xs text-gray-500 mb-4">Professional development activities logged by the employee for this cycle.</p>
+                        <p class="text-xs text-gray-500 mb-4">Professional development activities logged by the employee this year.</p>
                         @if ($appraisal->professionalDevelopment->isNotEmpty())
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200 text-sm">

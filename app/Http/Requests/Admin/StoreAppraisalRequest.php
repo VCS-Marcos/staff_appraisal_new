@@ -18,10 +18,10 @@ class StoreAppraisalRequest extends FormRequest
         return [
             'user_id' => [
                 'required', 'integer', Rule::exists('users', 'id'),
-                Rule::unique('appraisals', 'user_id')->where('cycle_id', $this->input('cycle_id')),
+                Rule::unique('appraisals', 'user_id')->where('year', $this->input('year')),
             ],
             'reviewer_id' => ['required', 'integer', 'different:user_id', Rule::exists('users', 'id')],
-            'cycle_id' => ['required', 'integer', Rule::exists('appraisal_cycles', 'id')],
+            'year' => ['required', 'integer', 'between:2000,2100'],
             'appraisal_date' => ['nullable', 'date'],
             'intent' => ['nullable', 'string', 'in:draft,open'],
             'targets' => ['array'],
@@ -34,7 +34,7 @@ class StoreAppraisalRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_id.unique' => 'This employee already has an appraisal for the selected cycle.',
+            'user_id.unique' => 'This employee already has an appraisal for the selected year.',
         ];
     }
 }

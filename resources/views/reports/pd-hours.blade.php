@@ -17,10 +17,10 @@
                 <div class="p-4 border-b border-gray-100">
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">PD Hours Report</p>
                     <form method="GET" class="flex gap-3">
-                        <select name="cycle_id" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
-                            <option value="">All Cycles</option>
-                            @foreach ($cycles as $cycle)
-                                <option value="{{ $cycle->id }}" @selected(request('cycle_id') == $cycle->id)>{{ $cycle->name }} ({{ $cycle->term->value }})</option>
+                        <select name="year" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
+                            <option value="">All Years</option>
+                            @foreach ($years as $year)
+                                <option value="{{ $year }}" @selected(request('year') == $year)>{{ $year }}</option>
                             @endforeach
                         </select>
                     </form>

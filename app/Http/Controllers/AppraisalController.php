@@ -29,13 +29,13 @@ class AppraisalController extends Controller
     {
         $user = $request->user();
 
-        $myAppraisals = Appraisal::with('cycle')
+        $myAppraisals = Appraisal::query()
             ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->get();
 
         $teamAppraisals = $user->isReviewer() || $user->isAdmin()
-            ? Appraisal::with(['employee', 'cycle'])
+            ? Appraisal::with('employee')
                 ->where('reviewer_id', $user->id)
                 ->orderByDesc('created_at')
                 ->get()
@@ -48,7 +48,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('view', $appraisal);
 
-        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
         return view('appraisals.show', compact('appraisal'));
     }
@@ -57,7 +57,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('updateAsEmployee', $appraisal);
 
-        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'currentTargets', 'professionalDevelopment']);
 
         $actingOnBehalf = auth()->id() !== $appraisal->user_id;
 
@@ -123,7 +123,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('updateAsReviewer', $appraisal);
 
-        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
         return view('appraisals.review', compact('appraisal'));
     }
@@ -177,7 +177,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('sign', $appraisal);
 
-        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
         return view('appraisals.sign', compact('appraisal'));
     }
@@ -207,7 +207,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('signOnBehalf', $appraisal);
 
-        $appraisal->load(['employee.lineManager', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee.lineManager', 'reviewer', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
         return view('appraisals.sign-in-person', compact('appraisal'));
     }
@@ -258,14 +258,14 @@ class AppraisalController extends Controller
     {
         $this->authorize('view', $appraisal);
 
-        $appraisal->load(['employee', 'reviewer', 'cycle', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
+        $appraisal->load(['employee', 'reviewer', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 
         AuditLog::record('appraisal.exported_pdf', $appraisal,
-            "Exported PDF for {$appraisal->employee->name} ({$appraisal->cycle->name} {$appraisal->cycle->term->value})");
+            "Exported PDF for {$appraisal->employee->name} ({$appraisal->year})");
 
         $pdf = Pdf::loadView('appraisals.pdf', compact('appraisal'))->setPaper('a4');
 
-        $filename = 'Appraisal-'.Str::slug($appraisal->employee->name).'-'.Str::slug($appraisal->cycle->name.'-'.$appraisal->cycle->term->value).'.pdf';
+        $filename = 'Appraisal-'.Str::slug($appraisal->employee->name).'-'.$appraisal->year.'.pdf';
 
         return $pdf->download($filename);
     }

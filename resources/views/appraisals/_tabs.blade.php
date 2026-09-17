@@ -7,7 +7,7 @@
     </div>
 
     <div x-show="tab === 'targets'">
-        <h2 class="text-base font-bold text-gray-800 mb-4">SECTION 1: REVIEW OF {{ strtoupper($appraisal->cycle->name) }} TARGETS</h2>
+        <h2 class="text-base font-bold text-gray-800 mb-4">SECTION 1: REVIEW OF {{ $appraisal->year }} TARGETS</h2>
         <div class="space-y-4">
             @forelse ($appraisal->currentTargets as $target)
                 <div class="border border-gray-200 rounded-md p-4">
@@ -30,7 +30,7 @@
                     @endif
                 </div>
             @empty
-                <p class="text-sm text-gray-500">No targets recorded for this cycle.</p>
+                <p class="text-sm text-gray-500">No targets recorded for this appraisal.</p>
             @endforelse
         </div>
     </div>

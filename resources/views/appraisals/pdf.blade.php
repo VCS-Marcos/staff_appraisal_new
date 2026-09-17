@@ -36,7 +36,7 @@
 <body>
     <div class="header-bar">
         <h1>INDEPENDENT SCHOOL STAFF APPRAISAL FORM</h1>
-        <p class="subtitle">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }} &middot; <span class="status-badge">{{ $appraisal->status->label() }}</span></p>
+        <p class="subtitle">{{ $appraisal->year }} Appraisal &middot; <span class="status-badge">{{ $appraisal->status->label() }}</span></p>
     </div>
 
     <div class="section">
@@ -50,16 +50,12 @@
                     <td><span class="label">Appraisal Date</span>{{ optional($appraisal->appraisal_date)->format('d M Y') ?? '—' }}</td>
                     <td><span class="label">Reviewer(s)</span>{{ $appraisal->reviewer->name }}</td>
                 </tr>
-                <tr>
-                    <td><span class="label">Type of Review</span>{{ $appraisal->cycle->term->value }} ({{ $appraisal->cycle->name }})</td>
-                    <td></td>
-                </tr>
             </table>
         </div>
     </div>
 
     <div class="section">
-        <h2>SECTION 1: REVIEW OF {{ strtoupper($appraisal->cycle->name) }} TARGETS</h2>
+        <h2>SECTION 1: REVIEW OF {{ $appraisal->year }} TARGETS</h2>
         <div class="section-body">
             @forelse ($appraisal->currentTargets as $target)
                 <div class="card">
@@ -75,7 +71,7 @@
                     @endif
                 </div>
             @empty
-                <p class="muted">No targets recorded for this cycle.</p>
+                <p class="muted">No targets recorded for this appraisal.</p>
             @endforelse
         </div>
     </div>

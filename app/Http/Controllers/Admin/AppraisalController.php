@@ -9,7 +9,6 @@ use App\Http\Requests\Admin\ReopenAppraisalRequest;
 use App\Http\Requests\Admin\StoreAppraisalRequest;
 use App\Http\Requests\Admin\UpdateAppraisalRequest;
 use App\Models\Appraisal;
-use App\Models\AppraisalCycle;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Notifications\AppraisalOpened;
@@ -35,14 +34,14 @@ class AppraisalController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $cycles = AppraisalCycle::orderByDesc('start_date')->get();
+        $years = $this->availableYears();
 
         $statusCounts = $this->filteredAppraisals($request, includeStatus: false)
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        return view('admin.appraisals.index', compact('appraisals', 'cycles', 'statusCounts'));
+        return view('admin.appraisals.index', compact('appraisals', 'years', 'statusCounts'));
     }
 
     public function exportCsv(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
@@ -53,15 +52,14 @@ class AppraisalController extends Controller
 
         return Response::streamDownload(function () use ($appraisals) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Employee', 'Position', 'Reviewer', 'Cycle', 'Term', 'Status', 'Completion Mode', 'Overall Rating', 'Appraisal Date', 'Employee Signed', 'Reviewer Signed']);
+            fputcsv($out, ['Employee', 'Position', 'Reviewer', 'Year', 'Status', 'Completion Mode', 'Overall Rating', 'Appraisal Date', 'Employee Signed', 'Reviewer Signed']);
 
             foreach ($appraisals as $appraisal) {
                 fputcsv($out, [
                     $appraisal->employee->name,
                     $appraisal->employee->position,
                     $appraisal->reviewer->name,
-                    $appraisal->cycle->name,
-                    $appraisal->cycle->term->value,
+                    $appraisal->year,
                     $appraisal->status->label(),
                     $appraisal->completion_mode->label(),
                     $appraisal->overall_rating?->value,
@@ -78,8 +76,8 @@ class AppraisalController extends Controller
     private function filteredAppraisals(Request $request, bool $includeStatus = true): Builder
     {
         return Appraisal::query()
-            ->when($includeStatus, fn ($q) => $q->with(['employee', 'reviewer', 'cycle']))
-            ->when($request->filled('cycle_id'), fn ($q) => $q->where('cycle_id', $request->integer('cycle_id')))
+            ->when($includeStatus, fn ($q) => $q->with(['employee', 'reviewer']))
+            ->when($request->filled('year'), fn ($q) => $q->where('year', $request->integer('year')))
             ->when($includeStatus && $request->filled('status'), function ($q) use ($request) {
                 $status = (string) $request->string('status');
 
@@ -96,11 +94,11 @@ class AppraisalController extends Controller
 
     public function create(Request $request): View
     {
-        $cycles = AppraisalCycle::orderByDesc('start_date')->get();
+        $years = $this->availableYears();
         $users = User::where('is_active', true)->orderBy('name')->get();
-        $selectedCycleId = $request->integer('cycle_id') ?: $cycles->first()?->id;
+        $selectedYear = $request->integer('year') ?: $years->first();
 
-        return view('admin.appraisals.create', compact('cycles', 'users', 'selectedCycleId'));
+        return view('admin.appraisals.create', compact('years', 'users', 'selectedYear'));
     }
 
     public function store(StoreAppraisalRequest $request): RedirectResponse
@@ -112,7 +110,7 @@ class AppraisalController extends Controller
             $appraisal = Appraisal::create([
                 'user_id' => $data['user_id'],
                 'reviewer_id' => $data['reviewer_id'],
-                'cycle_id' => $data['cycle_id'],
+                'year' => $data['year'],
                 'appraisal_date' => $data['appraisal_date'] ?? null,
                 'status' => $openNow ? AppraisalStatus::PendingEmployee : AppraisalStatus::Draft,
             ]);
@@ -122,13 +120,13 @@ class AppraisalController extends Controller
             return $appraisal;
         });
 
-        $appraisal->load(['employee', 'cycle']);
+        $appraisal->load('employee');
 
         if ($openNow) {
             $appraisal->employee->notify(new AppraisalOpened($appraisal));
             AuditLog::record('appraisal.created', $appraisal, sprintf(
-                'Created and opened appraisal for %s (%s %s) — awaiting employee',
-                $appraisal->employee->name, $appraisal->cycle->name, $appraisal->cycle->term->value,
+                'Created and opened appraisal for %s (%s) — awaiting employee',
+                $appraisal->employee->name, $appraisal->year,
             ));
 
             return redirect()->route('admin.appraisals.index')
@@ -136,8 +134,8 @@ class AppraisalController extends Controller
         }
 
         AuditLog::record('appraisal.created', $appraisal, sprintf(
-            'Created draft appraisal for %s (%s %s)',
-            $appraisal->employee->name, $appraisal->cycle->name, $appraisal->cycle->term->value,
+            'Created draft appraisal for %s (%s)',
+            $appraisal->employee->name, $appraisal->year,
         ));
 
         return redirect()->route('admin.appraisals.index')->with('status', 'Appraisal created as draft.');
@@ -147,7 +145,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('update', $appraisal);
 
-        $appraisal->load(['employee', 'reviewer', 'cycle', 'currentTargets']);
+        $appraisal->load(['employee', 'reviewer', 'currentTargets']);
         $users = User::where('is_active', true)->orderBy('name')->get();
 
         return view('admin.appraisals.edit', compact('appraisal', 'users'));
@@ -167,11 +165,11 @@ class AppraisalController extends Controller
             $this->syncCurrentTargets($appraisal, $data['targets'] ?? [], preserveResponses: true);
         });
 
-        $appraisal->load(['employee', 'cycle']);
+        $appraisal->load('employee');
 
         AuditLog::record('appraisal.updated', $appraisal, sprintf(
-            'Edited appraisal for %s (%s %s)',
-            $appraisal->employee->name, $appraisal->cycle->name, $appraisal->cycle->term->value,
+            'Edited appraisal for %s (%s)',
+            $appraisal->employee->name, $appraisal->year,
         ));
 
         return redirect()->route('admin.appraisals.index')->with('status', 'Appraisal updated.');
@@ -181,12 +179,11 @@ class AppraisalController extends Controller
     {
         $this->authorize('delete', $appraisal);
 
-        $appraisal->loadMissing(['employee', 'cycle']);
+        $appraisal->loadMissing('employee');
         $summary = sprintf(
-            'Deleted appraisal for %s (%s %s), status %s',
+            'Deleted appraisal for %s (%s), status %s',
             $appraisal->employee->name,
-            $appraisal->cycle->name,
-            $appraisal->cycle->term->value,
+            $appraisal->year,
             $appraisal->status->label(),
         );
 
@@ -217,7 +214,7 @@ class AppraisalController extends Controller
     {
         $this->authorize('reopen', $appraisal);
 
-        $appraisal->load(['employee', 'reviewer', 'cycle']);
+        $appraisal->load(['employee', 'reviewer']);
 
         return view('admin.appraisals.reopen', compact('appraisal'));
     }
@@ -251,6 +248,23 @@ class AppraisalController extends Controller
 
         return redirect()->route('admin.appraisals.index')
             ->with('status', "Appraisal sent back to {$toStatus->label()}.");
+    }
+
+    /**
+     * Years selectable for a new/filtered appraisal: any year already in use,
+     * plus a sensible forward-looking range so next year is always pickable.
+     *
+     * @return \Illuminate\Support\Collection<int, int>
+     */
+    private function availableYears(): \Illuminate\Support\Collection
+    {
+        $currentYear = now()->year;
+        $usedYears = Appraisal::query()->distinct()->pluck('year');
+
+        return $usedYears->push($currentYear, $currentYear + 1)
+            ->unique()
+            ->sortDesc()
+            ->values();
     }
 
     /**
@@ -294,7 +308,7 @@ class AppraisalController extends Controller
 
     /**
      * Fetch the employee's most recent prior next-year targets (if any) to prefill
-     * this cycle's current-target text fields, mirroring the paper form's carry-forward.
+     * this appraisal's current-target text fields, mirroring the paper form's carry-forward.
      */
     public function priorTargets(User $user): \Illuminate\Http\JsonResponse
     {

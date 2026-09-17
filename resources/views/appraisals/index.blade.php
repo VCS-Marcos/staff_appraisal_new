@@ -16,7 +16,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cycle</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                 <th class="px-6 py-3"></th>
                             </tr>
@@ -25,7 +25,7 @@
                             @foreach ($teamAppraisals as $appraisal)
                                 <tr>
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $appraisal->employee->name }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->year }}</td>
                                     <td class="px-6 py-4 text-sm"><x-status-badge :status="$appraisal->status" /></td>
                                     <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
                                         <x-action-menu>
@@ -53,7 +53,7 @@
                 <table class="min-w-full divide-y divide-gray-200 mt-4">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cycle</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                             <th class="px-6 py-3"></th>
                         </tr>
@@ -61,7 +61,7 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($myAppraisals as $appraisal)
                             <tr>
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $appraisal->year }}</td>
                                 <td class="px-6 py-4 text-sm"><x-status-badge :status="$appraisal->status" /></td>
                                 <td class="px-6 py-4 text-sm text-right space-x-3">
                                     @if ($appraisal->status === \App\Enums\AppraisalStatus::PendingEmployee)

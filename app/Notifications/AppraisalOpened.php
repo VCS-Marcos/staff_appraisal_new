@@ -20,7 +20,7 @@ class AppraisalOpened extends Notification
         return (new MailMessage)
             ->subject('Your appraisal is now open')
             ->greeting("Hi {$notifiable->name},")
-            ->line("Your appraisal for {$this->appraisal->cycle->name} ({$this->appraisal->cycle->term->value}) is now open.")
+            ->line("Your {$this->appraisal->year} appraisal is now open.")
             ->line('Please review your targets and complete your self-reflection.')
             ->action('Complete My Appraisal', route('appraisals.edit', $this->appraisal));
     }

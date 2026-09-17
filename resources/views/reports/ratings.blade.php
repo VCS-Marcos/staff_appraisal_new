@@ -26,10 +26,10 @@
                 <div class="p-4 border-b border-gray-100">
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Staff Ratings</p>
                     <form method="GET" class="flex gap-3">
-                        <select name="cycle_id" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
-                            <option value="">All Cycles</option>
-                            @foreach ($cycles as $cycle)
-                                <option value="{{ $cycle->id }}" @selected(request('cycle_id') == $cycle->id)>{{ $cycle->name }} ({{ $cycle->term->value }})</option>
+                        <select name="year" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
+                            <option value="">All Years</option>
+                            @foreach ($years as $year)
+                                <option value="{{ $year }}" @selected(request('year') == $year)>{{ $year }}</option>
                             @endforeach
                         </select>
                     </form>
@@ -40,7 +40,7 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reviewer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cycle</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Overall Rating</th>
                         </tr>
                     </thead>
@@ -49,7 +49,7 @@
                             <tr>
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $appraisal->employee->name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->reviewer->name }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500">{{ $appraisal->year }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-700">{{ $appraisal->overall_rating->value }}</td>
                             </tr>
                         @empty

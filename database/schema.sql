@@ -17,18 +17,6 @@ USE staff_appraisal_app;
 
 SET FOREIGN_KEY_CHECKS=0;
 
-CREATE TABLE `appraisal_cycles` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `term` enum('Term 1','Term 2','End of Year') NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE `users` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(150) NOT NULL,
@@ -52,23 +40,23 @@ CREATE TABLE `appraisals` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint(20) unsigned NOT NULL,
   `reviewer_id` bigint(20) unsigned NOT NULL,
-  `cycle_id` bigint(20) unsigned NOT NULL,
+  `year` smallint(5) unsigned NOT NULL,
   `appraisal_date` date DEFAULT NULL,
   `self_reflection` text DEFAULT NULL,
   `reviewer_comments` text DEFAULT NULL,
   `overall_rating` enum('Did Not Meet All Targets','Met All Targets','Exceeded All Targets') DEFAULT NULL,
   `next_review_date` date DEFAULT NULL,
   `status` enum('draft','pending_employee','pending_reviewer','pending_signoff','completed') NOT NULL DEFAULT 'draft',
+  `completion_mode` enum('self_service','assisted') NOT NULL DEFAULT 'self_service',
   `employee_signed_at` timestamp NULL DEFAULT NULL,
   `reviewer_signed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_user_cycle` (`user_id`,`cycle_id`),
+  UNIQUE KEY `uq_user_year` (`user_id`,`year`),
   KEY `appraisals_reviewer_id_foreign` (`reviewer_id`),
   KEY `idx_appraisals_status` (`status`),
-  KEY `idx_appraisals_cycle` (`cycle_id`),
-  CONSTRAINT `appraisals_cycle_id_foreign` FOREIGN KEY (`cycle_id`) REFERENCES `appraisal_cycles` (`id`),
+  KEY `idx_appraisals_completion_mode` (`completion_mode`),
   CONSTRAINT `appraisals_reviewer_id_foreign` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`id`),
   CONSTRAINT `appraisals_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -135,10 +123,13 @@ CREATE TABLE `audit_log` (
   `action` varchar(100) NOT NULL,
   `entity_type` varchar(100) NOT NULL,
   `entity_id` bigint(20) unsigned NOT NULL,
+  `description` varchar(500) DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `audit_log_user_id_foreign` (`user_id`),
+  KEY `idx_audit_entity` (`entity_type`,`entity_id`),
+  KEY `idx_audit_created` (`created_at`),
   CONSTRAINT `audit_log_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

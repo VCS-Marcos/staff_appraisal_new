@@ -32,9 +32,9 @@
                     @method('PUT')
 
                     <div>
-                        <x-input-label value="Cycle" />
-                        <p class="mt-1 text-sm text-gray-800">{{ $appraisal->cycle->name }} ({{ $appraisal->cycle->term->value }})</p>
-                        <p class="text-xs text-gray-500 mt-1">The cycle can't be changed. If it's wrong, delete this appraisal and create a new one.</p>
+                        <x-input-label value="Year" />
+                        <p class="mt-1 text-sm text-gray-800">{{ $appraisal->year }}</p>
+                        <p class="text-xs text-gray-500 mt-1">The year can't be changed. If it's wrong, delete this appraisal and create a new one.</p>
                     </div>
 
                     <div>

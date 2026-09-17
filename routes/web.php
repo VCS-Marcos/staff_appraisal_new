@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AppraisalCycleController;
 use App\Http\Controllers\Admin\AppraisalController as AdminAppraisalController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AppraisalController;
@@ -49,8 +48,10 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
     });
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('users/import', [AdminUserController::class, 'showImport'])->name('users.import');
+        Route::post('users/import', [AdminUserController::class, 'import'])->name('users.import.submit');
+        Route::get('users/import/template', [AdminUserController::class, 'downloadTemplate'])->name('users.import.template');
         Route::resource('users', AdminUserController::class)->except(['show']);
-        Route::resource('cycles', AppraisalCycleController::class)->except(['show']);
 
         Route::get('appraisals', [AdminAppraisalController::class, 'index'])->name('appraisals.index');
         Route::get('appraisals/export', [AdminAppraisalController::class, 'exportCsv'])->name('appraisals.export');

@@ -20,7 +20,7 @@ class AppraisalReadyForSignoff extends Notification
         return (new MailMessage)
             ->subject('Appraisal ready for sign-off')
             ->greeting("Hi {$notifiable->name},")
-            ->line("The appraisal for {$this->appraisal->employee->name} — {$this->appraisal->cycle->name} ({$this->appraisal->cycle->term->value}) — is complete and ready for sign-off.")
+            ->line("The {$this->appraisal->year} appraisal for {$this->appraisal->employee->name} is complete and ready for sign-off.")
             ->action('Review & Sign', route('appraisals.sign', $this->appraisal));
     }
 }

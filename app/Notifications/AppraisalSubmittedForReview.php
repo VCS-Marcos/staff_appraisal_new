@@ -20,7 +20,7 @@ class AppraisalSubmittedForReview extends Notification
         return (new MailMessage)
             ->subject('An appraisal is ready for your review')
             ->greeting("Hi {$notifiable->name},")
-            ->line("{$this->appraisal->employee->name} has submitted their self-reflection for {$this->appraisal->cycle->name} ({$this->appraisal->cycle->term->value}).")
+            ->line("{$this->appraisal->employee->name} has submitted their self-reflection for their {$this->appraisal->year} appraisal.")
             ->line('Please add your comments, set an overall rating, and submit your review.')
             ->action('Review Appraisal', route('appraisals.review', $this->appraisal));
     }

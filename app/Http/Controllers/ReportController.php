@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appraisal;
-use App\Models\AppraisalCycle;
 use App\Models\AuditLog;
 use App\Models\ProfessionalDevelopment;
 use App\Models\User;
@@ -22,10 +21,10 @@ class ReportController extends Controller
 
     public function completion(Request $request): View
     {
-        $cycles = AppraisalCycle::orderByDesc('start_date')->get();
+        $years = $this->availableYears();
         $rows = $this->completionQuery($request)->get();
 
-        return view('reports.completion', compact('cycles', 'rows'));
+        return view('reports.completion', compact('years', 'rows'));
     }
 
     public function exportCompletion(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
@@ -36,12 +35,11 @@ class ReportController extends Controller
 
         return Response::streamDownload(function () use ($rows) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Cycle', 'Term', 'Total', 'Draft', 'Awaiting Employee', 'Awaiting Reviewer', 'Awaiting Sign-off', 'Completed', 'Completion %']);
+            fputcsv($out, ['Year', 'Total', 'Draft', 'Awaiting Employee', 'Awaiting Reviewer', 'Awaiting Sign-off', 'Completed', 'Completion %']);
 
             foreach ($rows as $row) {
                 fputcsv($out, [
-                    $row->cycle_name,
-                    $row->cycle_term,
+                    $row->year,
                     $row->total,
                     $row->draft,
                     $row->pending_employee,
@@ -59,25 +57,24 @@ class ReportController extends Controller
     private function completionQuery(Request $request): \Illuminate\Database\Query\Builder
     {
         return DB::table('appraisals')
-            ->join('appraisal_cycles', 'appraisal_cycles.id', '=', 'appraisals.cycle_id')
-            ->when($request->filled('cycle_id'), fn ($q) => $q->where('appraisals.cycle_id', $request->integer('cycle_id')))
-            ->selectRaw("appraisal_cycles.id as cycle_id, appraisal_cycles.name as cycle_name, appraisal_cycles.term as cycle_term,
+            ->when($request->filled('year'), fn ($q) => $q->where('appraisals.year', $request->integer('year')))
+            ->selectRaw("appraisals.year as year,
                 COUNT(*) as total,
                 SUM(CASE WHEN appraisals.status = 'draft' THEN 1 ELSE 0 END) as draft,
                 SUM(CASE WHEN appraisals.status = 'pending_employee' THEN 1 ELSE 0 END) as pending_employee,
                 SUM(CASE WHEN appraisals.status = 'pending_reviewer' THEN 1 ELSE 0 END) as pending_reviewer,
                 SUM(CASE WHEN appraisals.status = 'pending_signoff' THEN 1 ELSE 0 END) as pending_signoff,
                 SUM(CASE WHEN appraisals.status = 'completed' THEN 1 ELSE 0 END) as completed")
-            ->groupBy('appraisal_cycles.id', 'appraisal_cycles.name', 'appraisal_cycles.term')
-            ->orderByDesc('appraisal_cycles.id');
+            ->groupBy('appraisals.year')
+            ->orderByDesc('appraisals.year');
     }
 
     public function ratings(Request $request): View
     {
-        $cycles = AppraisalCycle::orderByDesc('start_date')->get();
+        $years = $this->availableYears();
 
         $appraisals = $this->ratingsQuery($request)
-            ->with(['employee', 'reviewer', 'cycle'])
+            ->with(['employee', 'reviewer'])
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
@@ -87,13 +84,13 @@ class ReportController extends Controller
             ->groupBy('overall_rating')
             ->pluck('total', 'overall_rating');
 
-        return view('reports.ratings', compact('cycles', 'appraisals', 'distribution'));
+        return view('reports.ratings', compact('years', 'appraisals', 'distribution'));
     }
 
     public function exportRatings(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $appraisals = $this->ratingsQuery($request)
-            ->with(['employee', 'reviewer', 'cycle'])
+            ->with(['employee', 'reviewer'])
             ->orderByDesc('created_at')
             ->get();
 
@@ -101,15 +98,14 @@ class ReportController extends Controller
 
         return Response::streamDownload(function () use ($appraisals) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Employee', 'Position', 'Reviewer', 'Cycle', 'Term', 'Overall Rating']);
+            fputcsv($out, ['Employee', 'Position', 'Reviewer', 'Year', 'Overall Rating']);
 
             foreach ($appraisals as $appraisal) {
                 fputcsv($out, [
                     $appraisal->employee->name,
                     $appraisal->employee->position,
                     $appraisal->reviewer->name,
-                    $appraisal->cycle->name,
-                    $appraisal->cycle->term->value,
+                    $appraisal->year,
                     $appraisal->overall_rating?->value,
                 ]);
             }
@@ -122,7 +118,17 @@ class ReportController extends Controller
     {
         return Appraisal::query()
             ->whereNotNull('overall_rating')
-            ->when($request->filled('cycle_id'), fn ($q) => $q->where('cycle_id', $request->integer('cycle_id')));
+            ->when($request->filled('year'), fn ($q) => $q->where('year', $request->integer('year')));
+    }
+
+    /**
+     * Years to offer in report filters, derived from appraisal data actually on file.
+     *
+     * @return \Illuminate\Support\Collection<int, int>
+     */
+    private function availableYears(): \Illuminate\Support\Collection
+    {
+        return Appraisal::query()->distinct()->orderByDesc('year')->pluck('year');
     }
 
     public function audit(Request $request): View
@@ -177,10 +183,10 @@ class ReportController extends Controller
 
     public function pdHours(Request $request): View
     {
-        $cycles = AppraisalCycle::orderByDesc('start_date')->get();
+        $years = $this->availableYears();
         $summary = $this->pdHoursQuery($request)->get();
 
-        return view('reports.pd-hours', compact('cycles', 'summary'));
+        return view('reports.pd-hours', compact('years', 'summary'));
     }
 
     public function exportPdHours(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
@@ -208,7 +214,7 @@ class ReportController extends Controller
         return ProfessionalDevelopment::query()
             ->join('users', 'users.id', '=', 'professional_development.user_id')
             ->join('appraisals', 'appraisals.id', '=', 'professional_development.appraisal_id')
-            ->when($request->filled('cycle_id'), fn ($q) => $q->where('appraisals.cycle_id', $request->integer('cycle_id')))
+            ->when($request->filled('year'), fn ($q) => $q->where('appraisals.year', $request->integer('year')))
             ->when(! $user->isAdmin(), fn ($q) => $q->where(function ($q2) use ($user) {
                 $q2->where('users.line_manager_id', $user->id)->orWhere('users.id', $user->id);
             }))

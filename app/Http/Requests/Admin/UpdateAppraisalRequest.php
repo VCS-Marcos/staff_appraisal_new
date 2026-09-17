@@ -20,7 +20,7 @@ class UpdateAppraisalRequest extends FormRequest
             'user_id' => [
                 'required', 'integer', Rule::exists('users', 'id'),
                 Rule::unique('appraisals', 'user_id')
-                    ->where('cycle_id', $appraisal->cycle_id)
+                    ->where('year', $appraisal->year)
                     ->ignore($appraisal->id),
             ],
             'reviewer_id' => ['required', 'integer', 'different:user_id', Rule::exists('users', 'id')],
@@ -36,7 +36,7 @@ class UpdateAppraisalRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_id.unique' => 'This employee already has a different appraisal for this cycle.',
+            'user_id.unique' => 'This employee already has a different appraisal for this year.',
         ];
     }
 }

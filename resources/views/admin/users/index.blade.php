@@ -2,9 +2,14 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Staff Accounts') }}</h2>
-            <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
-                <x-icon name="plus" class="w-3.5 h-3.5" /> Add Staff
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.users.import') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                    <x-icon name="upload" class="w-3.5 h-3.5" /> Import CSV
+                </a>
+                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                    <x-icon name="plus" class="w-3.5 h-3.5" /> Add Staff
+                </a>
+            </div>
         </div>
     </x-slot>
 

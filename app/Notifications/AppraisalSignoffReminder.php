@@ -20,7 +20,7 @@ class AppraisalSignoffReminder extends Notification
         return (new MailMessage)
             ->subject('Reminder: appraisal awaiting your signature')
             ->greeting("Hi {$notifiable->name},")
-            ->line("The appraisal for {$this->appraisal->employee->name} — {$this->appraisal->cycle->name} ({$this->appraisal->cycle->term->value}) — is still awaiting your signature.")
+            ->line("The {$this->appraisal->year} appraisal for {$this->appraisal->employee->name} is still awaiting your signature.")
             ->action('Sign Now', route('appraisals.sign', $this->appraisal));
     }
 }

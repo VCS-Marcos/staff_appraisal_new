@@ -14,13 +14,13 @@
                     @csrf
 
                     <div>
-                        <x-input-label for="cycle_id" value="Cycle" />
-                        <select id="cycle_id" name="cycle_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                            @foreach ($cycles as $cycle)
-                                <option value="{{ $cycle->id }}" @selected(old('cycle_id', $selectedCycleId) == $cycle->id)>{{ $cycle->name }} ({{ $cycle->term->value }})</option>
+                        <x-input-label for="year" value="Year" />
+                        <select id="year" name="year" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                            @foreach ($years as $year)
+                                <option value="{{ $year }}" @selected(old('year', $selectedYear) == $year)>{{ $year }}</option>
                             @endforeach
                         </select>
-                        <x-input-error :messages="$errors->get('cycle_id')" class="mt-2" />
+                        <x-input-error :messages="$errors->get('year')" class="mt-2" />
                     </div>
 
                     <div>
@@ -55,7 +55,7 @@
 
                     <div>
                         <h3 class="text-sm font-semibold text-gray-700 mb-1">Section 1 Targets</h3>
-                        <p class="text-xs text-gray-500 mb-3">Carried forward from last cycle's new targets, if any. Add or remove target cards as needed.</p>
+                        <p class="text-xs text-gray-500 mb-3">Carried forward from last year's new targets, if any. Add or remove target cards as needed.</p>
 
                         <div class="space-y-3">
                             <template x-for="(target, index) in targets" :key="index">

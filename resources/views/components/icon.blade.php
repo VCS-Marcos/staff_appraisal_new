@@ -45,13 +45,6 @@
         </svg>
         @break
 
-    @case('cycles')
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" {{ $attributes->merge(['class' => $classes]) }}>
-            <rect x="3.5" y="5" width="17" height="15" rx="1.5" />
-            <path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" />
-        </svg>
-        @break
-
     @case('list')
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" {{ $attributes->merge(['class' => $classes]) }}>
             <path d="M8.5 6.5h11.5M8.5 12h11.5M8.5 17.5h11.5" />
@@ -140,6 +133,13 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" {{ $attributes->merge(['class' => $classes]) }}>
             <path d="M7 10 3.5 6.5 7 3" />
             <path d="M3.5 6.5h10a6 6 0 0 1 0 12H9" />
+        </svg>
+        @break
+
+    @case('upload')
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" {{ $attributes->merge(['class' => $classes]) }}>
+            <path d="M12 15V4M8 8l4-4 4 4" />
+            <path d="M4.5 17v2.5A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5V17" />
         </svg>
         @break
 

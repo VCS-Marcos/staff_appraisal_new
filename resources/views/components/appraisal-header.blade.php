@@ -50,7 +50,7 @@
 
     <div class="flex flex-wrap items-center gap-2 mt-4">
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
-            {{ $appraisal->cycle->name }} &middot; {{ $appraisal->cycle->term->value }}
+            {{ $appraisal->year }} Appraisal
         </span>
 
         @foreach ($stages as $i => $stage)
