@@ -252,7 +252,8 @@ class AppraisalController extends Controller
 
     /**
      * Years selectable for a new/filtered appraisal: any year already in use,
-     * plus a sensible forward-looking range so next year is always pickable.
+     * plus a sensible range around today so both recent and further-ahead
+     * years are always pickable without needing an appraisal to exist yet.
      *
      * @return \Illuminate\Support\Collection<int, int>
      */
@@ -260,8 +261,9 @@ class AppraisalController extends Controller
     {
         $currentYear = now()->year;
         $usedYears = Appraisal::query()->distinct()->pluck('year');
+        $range = range($currentYear - 2, $currentYear + 5);
 
-        return $usedYears->push($currentYear, $currentYear + 1)
+        return $usedYears->merge($range)
             ->unique()
             ->sortDesc()
             ->values();
