@@ -17,6 +17,8 @@ env:
   APP_DEBUG: "false"
   APP_URL: "https://hr-appraisal-preview.wasmer.app"
   APP_SUBTITLE: "Staff Performance Management System"
+  APP_BRANDING: "false"
+  APP_PDF_TITLE: "STAFF APPRAISAL FORM"
   DB_CONNECTION: mysql
   APP_LOCALE: en
   APP_FALLBACK_LOCALE: en

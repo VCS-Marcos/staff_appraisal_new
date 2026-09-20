@@ -36,7 +36,7 @@
 <body>
     @php
         $logoPath = public_path('images/school-logo.png');
-        $logoData = is_file($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
+        $logoData = config('app.branding') && is_file($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
     @endphp
     <div class="header-bar">
         <table style="width: 100%; border-collapse: collapse;">
@@ -47,7 +47,7 @@
                     </td>
                 @endif
                 <td style="padding-left: 12px; vertical-align: middle;">
-                    <h1>INDEPENDENT SCHOOL STAFF APPRAISAL FORM</h1>
+                    <h1>{{ config('app.pdf_title') }}</h1>
                     <p class="subtitle">{{ $appraisal->year }} Appraisal &middot; <span class="status-badge">{{ $appraisal->status->label() }}</span></p>
                 </td>
             </tr>

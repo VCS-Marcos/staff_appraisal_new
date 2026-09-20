@@ -17,6 +17,10 @@ return [
 
     'subtitle' => env('APP_SUBTITLE', 'Independent School Seychelles'),
 
+    // Show the school's logo/name (true) or a generic icon and title (false, used on the public preview host).
+    'branding' => (bool) env('APP_BRANDING', true),
+    'pdf_title' => env('APP_PDF_TITLE', 'INDEPENDENT SCHOOL STAFF APPRAISAL FORM'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
