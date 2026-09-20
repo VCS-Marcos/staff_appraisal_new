@@ -17,7 +17,7 @@
         <!-- Row 1: Branding + account actions -->
         <div class="flex items-center justify-between h-16">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-2 min-w-0">
-                <x-application-logo class="w-7 h-7 shrink-0 text-indigo-600" />
+                <x-application-logo class="h-9 w-auto shrink-0" />
                 <span class="font-bold text-gray-900 truncate">{{ config('app.name') }} System</span>
             </a>
 

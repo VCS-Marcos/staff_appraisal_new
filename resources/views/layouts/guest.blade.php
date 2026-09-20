@@ -7,6 +7,8 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <link rel="icon" href="{{ asset('images/school-logo.png') }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -18,9 +20,7 @@
         <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-10">
             <div class="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
                 <div class="flex flex-col items-center text-center mb-6">
-                    <div class="w-14 h-14 rounded-full bg-indigo-600 flex items-center justify-center mb-4">
-                        <x-application-logo class="w-7 h-7 text-white" />
-                    </div>
+                    <x-application-logo class="h-20 mb-4" />
                     <h1 class="text-xl font-bold text-gray-900">{{ config('app.name') }} System</h1>
                     <p class="text-sm text-gray-500 mt-1">{{ config('app.subtitle') }}</p>
                 </div>
