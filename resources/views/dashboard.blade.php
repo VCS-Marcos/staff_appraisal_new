@@ -47,6 +47,14 @@
                     </div>
                 </div>
             @else
+                @if (auth()->user()->isReviewer())
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Quick Actions</h3>
+                        <a href="{{ route('admin.appraisals.create') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
+                            <x-icon name="plus" class="w-4 h-4" /> Create an appraisal for one of your staff
+                        </a>
+                    </div>
+                @endif
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
                         <div class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</div>

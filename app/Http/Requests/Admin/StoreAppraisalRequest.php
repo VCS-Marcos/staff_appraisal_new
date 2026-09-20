@@ -13,11 +13,24 @@ class StoreAppraisalRequest extends FormRequest
         return $this->user()->can('create', Appraisal::class);
     }
 
+    protected function prepareForValidation(): void
+    {
+        // A reviewer can only create appraisals they review themselves.
+        if (! $this->user()->isAdmin()) {
+            $this->merge(['reviewer_id' => $this->user()->id]);
+        }
+    }
+
     public function rules(): array
     {
+        $user = $this->user();
+
         return [
             'user_id' => [
-                'required', 'integer', Rule::exists('users', 'id'),
+                'required', 'integer',
+                $user->isAdmin()
+                    ? Rule::exists('users', 'id')
+                    : Rule::in($user->appraisableStaff()->pluck('id')->all()),
                 Rule::unique('appraisals', 'user_id')->where('year', $this->input('year')),
             ],
             'reviewer_id' => ['required', 'integer', 'different:user_id', Rule::exists('users', 'id')],
@@ -35,6 +48,7 @@ class StoreAppraisalRequest extends FormRequest
     {
         return [
             'user_id.unique' => 'This employee already has an appraisal for the selected year.',
+            'user_id.in' => 'You can only create appraisals for staff you manage or review.',
         ];
     }
 }

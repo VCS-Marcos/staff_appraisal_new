@@ -35,6 +35,14 @@
                         <x-input-error :messages="$errors->get('user_id')" class="mt-2" />
                     </div>
 
+                    @if (! auth()->user()->isAdmin())
+                        <div>
+                            <x-input-label value="Reviewer" />
+                            <p class="mt-1 text-sm text-gray-800">{{ auth()->user()->name }} (you)</p>
+                            <p class="text-xs text-gray-500 mt-1">Appraisals you create are assigned to you as the reviewer. You can only pick staff you manage or review.</p>
+                            <x-input-error :messages="$errors->get('reviewer_id')" class="mt-2" />
+                        </div>
+                    @else
                     <div>
                         <x-input-label for="reviewer_id" value="Reviewer" />
                         <select id="reviewer_id" name="reviewer_id" x-model="reviewerId" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
@@ -46,6 +54,7 @@
                         <p class="text-xs text-gray-500 mt-1">Defaults to the employee's line manager — change if needed.</p>
                         <x-input-error :messages="$errors->get('reviewer_id')" class="mt-2" />
                     </div>
+                    @endif
 
                     <div>
                         <x-input-label for="appraisal_date" value="Appraisal Date (optional)" />
@@ -79,7 +88,7 @@
                     </div>
 
                     <div class="flex flex-wrap justify-end gap-3">
-                        <a href="{{ route('admin.appraisals.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                        <a href="{{ auth()->user()->isAdmin() ? route('admin.appraisals.index') : route('appraisals.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                             Cancel
                         </a>
                         <button type="submit" name="intent" value="draft" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">

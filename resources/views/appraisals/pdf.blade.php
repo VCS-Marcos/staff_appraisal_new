@@ -8,7 +8,7 @@
         body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #1f2937; }
         h1 { font-size: 18px; margin: 0 0 2px; color: #111827; }
         .subtitle { color: #6b7280; font-size: 10px; margin: 0 0 16px; }
-        h2 { font-size: 12px; margin: 0 0 10px; color: #ffffff; background-color: #374151; padding: 6px 10px; }
+        h2 { font-size: 12px; margin: 0 0 10px; color: #ffffff; background-color: #1b336d; padding: 6px 10px; }
         h3 { font-size: 11px; margin: 10px 0 2px; color: #374151; }
         p { margin: 0 0 8px; line-height: 1.4; }
         .muted { color: #6b7280; }
@@ -27,7 +27,7 @@
         table.signoff { width: 100%; border-collapse: collapse; }
         table.signoff td { width: 50%; padding: 10px; border: 1px solid #e5e7eb; background-color: #f9fafb; }
         .footer { margin-top: 16px; font-size: 8.5px; color: #9ca3af; text-align: center; }
-        .header-bar { background-color: #111827; color: #ffffff; padding: 12px 14px; margin-bottom: 14px; }
+        .header-bar { background-color: #1a2d5a; border-bottom: 3px solid #f2df2f; color: #ffffff; padding: 12px 14px; margin-bottom: 14px; }
         .header-bar h1 { color: #ffffff; }
         .header-bar .subtitle { color: #d1d5db; margin-bottom: 0; }
         .status-badge { display: inline-block; background-color: #374151; color: #ffffff; padding: 2px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.03em; }

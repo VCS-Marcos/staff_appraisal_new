@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,6 +49,29 @@ class User extends Authenticatable
     public function isEmployee(): bool
     {
         return $this->role === UserRole::Employee;
+    }
+
+    /**
+     * Staff this user may create appraisals for: everyone for an admin; for a
+     * reviewer, only their direct reports (line manager) and anyone they are
+     * already the assigned reviewer for. Never themselves.
+     */
+    public function appraisableStaff(): Builder
+    {
+        $query = User::query()->where('is_active', true);
+
+        if ($this->isAdmin()) {
+            return $query;
+        }
+
+        if (! $this->isReviewer()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->where('id', '!=', $this->id)->where(function (Builder $q) {
+            $q->where('line_manager_id', $this->id)
+                ->orWhereIn('id', Appraisal::query()->where('reviewer_id', $this->id)->select('user_id'));
+        });
     }
 
     public function lineManager(): BelongsTo

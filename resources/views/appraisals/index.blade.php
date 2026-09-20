@@ -1,6 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('My Appraisals') }}</h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('My Appraisals') }}</h2>
+            @can('create', \App\Models\Appraisal::class)
+                <a href="{{ route('admin.appraisals.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                    <x-icon name="plus" class="w-3.5 h-3.5" /> Create Appraisal
+                </a>
+            @endcan
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -29,6 +36,9 @@
                                     <td class="px-6 py-4 text-sm"><x-status-badge :status="$appraisal->status" /></td>
                                     <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
                                         <x-action-menu>
+                                            @can('open', $appraisal)
+                                                <x-action-menu.form-item :action="route('admin.appraisals.open', $appraisal)" method="PATCH" icon="unlock" variant="success">Open for Employee</x-action-menu.form-item>
+                                            @endcan
                                             @can('updateAsEmployee', $appraisal)
                                                 <x-action-menu.item :href="route('appraisals.edit', $appraisal)" icon="pencil" variant="warning">Complete In Person</x-action-menu.item>
                                             @endcan
@@ -42,6 +52,7 @@
                                                 <x-action-menu.item :href="route('appraisals.sign-in-person', $appraisal)" icon="check-circle" variant="warning">Complete Sign-off (In Person)</x-action-menu.item>
                                             @endcan
                                             <x-action-menu.item :href="route('appraisals.show', $appraisal)" icon="eye">View</x-action-menu.item>
+                                            <x-action-menu.item :href="route('appraisals.pdf', $appraisal)" icon="download">Download</x-action-menu.item>
                                         </x-action-menu>
                                     </td>
                                 </tr>

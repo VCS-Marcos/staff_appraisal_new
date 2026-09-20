@@ -32,13 +32,13 @@
                 @can('signOnBehalf', $appraisal)
                     <a href="{{ route('appraisals.sign-in-person', $appraisal) }}" class="inline-flex items-center px-4 py-2 bg-amber-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-amber-700">Complete Sign-off (In Person)</a>
                 @endcan
-                @if (auth()->user()->isAdmin() && $appraisal->status === \App\Enums\AppraisalStatus::Draft)
+                @can('open', $appraisal)
                     <form method="POST" action="{{ route('admin.appraisals.open', $appraisal) }}">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="inline-flex items-center px-4 py-2 bg-emerald-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-emerald-700">Open for Employee</button>
                     </form>
-                @endif
+                @endcan
                 @can('reopen', $appraisal)
                     <a href="{{ route('admin.appraisals.reopen', $appraisal) }}" class="inline-flex items-center px-4 py-2 bg-white border border-amber-300 rounded-md font-semibold text-xs text-amber-700 uppercase tracking-widest hover:bg-amber-50">Send Back</a>
                 @endcan

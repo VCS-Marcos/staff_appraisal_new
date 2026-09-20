@@ -22,7 +22,20 @@ class AppraisalPolicy
 
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isReviewer();
+    }
+
+    /**
+     * Open a draft for the employee: admins any, reviewers only their own drafts.
+     */
+    public function open(User $user, Appraisal $appraisal): bool
+    {
+        if ($appraisal->status !== AppraisalStatus::Draft) {
+            return false;
+        }
+
+        return $user->isAdmin()
+            || ($user->isReviewer() && $appraisal->reviewer_id === $user->id);
     }
 
     public function update(User $user, Appraisal $appraisal): bool

@@ -47,6 +47,14 @@ Route::middleware(['auth', 'active', 'verified', 'no-cache'])->group(function ()
         });
     });
 
+    // Creating and opening appraisals is shared with reviewers, who are limited to their own staff.
+    Route::prefix('admin')->name('admin.')->middleware('role:admin,reviewer')->group(function () {
+        Route::get('appraisals/create', [AdminAppraisalController::class, 'create'])->name('appraisals.create');
+        Route::post('appraisals', [AdminAppraisalController::class, 'store'])->name('appraisals.store');
+        Route::get('appraisals/prior-targets/{user}', [AdminAppraisalController::class, 'priorTargets'])->name('appraisals.prior-targets');
+        Route::patch('appraisals/{appraisal}/open', [AdminAppraisalController::class, 'open'])->name('appraisals.open');
+    });
+
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('users/import', [AdminUserController::class, 'showImport'])->name('users.import');
         Route::post('users/import', [AdminUserController::class, 'import'])->name('users.import.submit');
@@ -55,13 +63,9 @@ Route::middleware(['auth', 'active', 'verified', 'no-cache'])->group(function ()
 
         Route::get('appraisals', [AdminAppraisalController::class, 'index'])->name('appraisals.index');
         Route::get('appraisals/export', [AdminAppraisalController::class, 'exportCsv'])->name('appraisals.export');
-        Route::get('appraisals/create', [AdminAppraisalController::class, 'create'])->name('appraisals.create');
-        Route::post('appraisals', [AdminAppraisalController::class, 'store'])->name('appraisals.store');
-        Route::get('appraisals/prior-targets/{user}', [AdminAppraisalController::class, 'priorTargets'])->name('appraisals.prior-targets');
         Route::get('appraisals/{appraisal}/edit', [AdminAppraisalController::class, 'edit'])->name('appraisals.edit');
         Route::put('appraisals/{appraisal}', [AdminAppraisalController::class, 'update'])->name('appraisals.update');
         Route::delete('appraisals/{appraisal}', [AdminAppraisalController::class, 'destroy'])->name('appraisals.destroy');
-        Route::patch('appraisals/{appraisal}/open', [AdminAppraisalController::class, 'open'])->name('appraisals.open');
         Route::get('appraisals/{appraisal}/reopen', [AdminAppraisalController::class, 'showReopen'])->name('appraisals.reopen');
         Route::patch('appraisals/{appraisal}/reopen', [AdminAppraisalController::class, 'reopen'])->name('appraisals.reopen.submit');
     });

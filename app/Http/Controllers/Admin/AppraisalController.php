@@ -95,7 +95,7 @@ class AppraisalController extends Controller
     public function create(Request $request): View
     {
         $years = $this->availableYears();
-        $users = User::where('is_active', true)->orderBy('name')->get();
+        $users = $request->user()->appraisableStaff()->orderBy('name')->get();
         $selectedYear = $request->integer('year') ?: $years->first();
 
         return view('admin.appraisals.create', compact('years', 'users', 'selectedYear'));
@@ -125,20 +125,20 @@ class AppraisalController extends Controller
         if ($openNow) {
             $appraisal->employee->notify(new AppraisalOpened($appraisal));
             AuditLog::record('appraisal.created', $appraisal, sprintf(
-                'Created and opened appraisal for %s (%s) — awaiting employee',
-                $appraisal->employee->name, $appraisal->year,
+                'Created and opened appraisal for %s (%s) — awaiting employee%s',
+                $appraisal->employee->name, $appraisal->year, $this->creatorNote($request),
             ));
 
-            return redirect()->route('admin.appraisals.index')
+            return redirect()->route($this->indexRoute($request))
                 ->with('status', 'Appraisal created and opened for the employee.');
         }
 
         AuditLog::record('appraisal.created', $appraisal, sprintf(
-            'Created draft appraisal for %s (%s)',
-            $appraisal->employee->name, $appraisal->year,
+            'Created draft appraisal for %s (%s)%s',
+            $appraisal->employee->name, $appraisal->year, $this->creatorNote($request),
         ));
 
-        return redirect()->route('admin.appraisals.index')->with('status', 'Appraisal created as draft.');
+        return redirect()->route($this->indexRoute($request))->with('status', 'Appraisal created as draft.');
     }
 
     public function edit(Appraisal $appraisal): View
@@ -194,16 +194,16 @@ class AppraisalController extends Controller
         return redirect()->route('admin.appraisals.index')->with('status', 'Appraisal deleted.');
     }
 
-    public function open(Appraisal $appraisal): RedirectResponse
+    public function open(Request $request, Appraisal $appraisal): RedirectResponse
     {
-        $this->authorize('update', $appraisal);
+        $this->authorize('open', $appraisal);
 
         if ($appraisal->status === AppraisalStatus::Draft) {
             $appraisal->update(['status' => AppraisalStatus::PendingEmployee]);
             $appraisal->employee->notify(new AppraisalOpened($appraisal));
 
             AuditLog::record('appraisal.opened', $appraisal, sprintf(
-                'Opened appraisal for %s — now awaiting employee', $appraisal->employee->name,
+                'Opened appraisal for %s — now awaiting employee%s', $appraisal->employee->name, $this->creatorNote($request),
             ));
         }
 
@@ -257,6 +257,18 @@ class AppraisalController extends Controller
      *
      * @return \Illuminate\Support\Collection<int, int>
      */
+    private function indexRoute(Request $request): string
+    {
+        return $request->user()->isAdmin() ? 'admin.appraisals.index' : 'appraisals.index';
+    }
+
+    private function creatorNote(Request $request): string
+    {
+        $user = $request->user();
+
+        return sprintf(' — by %s (%s)', $user->name, $user->role->value);
+    }
+
     private function availableYears(): \Illuminate\Support\Collection
     {
         $currentYear = now()->year;
@@ -312,8 +324,10 @@ class AppraisalController extends Controller
      * Fetch the employee's most recent prior next-year targets (if any) to prefill
      * this appraisal's current-target text fields, mirroring the paper form's carry-forward.
      */
-    public function priorTargets(User $user): \Illuminate\Http\JsonResponse
+    public function priorTargets(Request $request, User $user): \Illuminate\Http\JsonResponse
     {
+        abort_unless($request->user()->appraisableStaff()->whereKey($user->id)->exists(), 403);
+
         $prior = Appraisal::where('user_id', $user->id)
             ->whereHas('targets', fn ($q) => $q->where('target_type', TargetType::NextYear))
             ->with(['targets' => fn ($q) => $q->where('target_type', TargetType::NextYear)->orderBy('target_number')])
