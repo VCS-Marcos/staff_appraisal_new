@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -33,6 +34,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => UserRole::class,
             'is_active' => 'boolean',
+            'photo_updated_at' => 'datetime',
         ];
     }
 
@@ -72,6 +74,24 @@ class User extends Authenticatable
             $q->where('line_manager_id', $this->id)
                 ->orWhereIn('id', Appraisal::query()->where('reviewer_id', $this->id)->select('user_id'));
         });
+    }
+
+    public function photo(): HasOne
+    {
+        return $this->hasOne(UserPhoto::class);
+    }
+
+    public function hasPhoto(): bool
+    {
+        return $this->photo_updated_at !== null;
+    }
+
+    /** URL of the staff photo, versioned so a replaced photo isn't served from cache. */
+    public function photoUrl(): ?string
+    {
+        return $this->hasPhoto()
+            ? route('users.photo', ['user' => $this, 'v' => $this->photo_updated_at->timestamp])
+            : null;
     }
 
     public function lineManager(): BelongsTo

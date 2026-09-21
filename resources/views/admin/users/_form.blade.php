@@ -15,6 +15,32 @@
 </div>
 
 <div>
+    <x-input-label for="photo" value="Staff Photo (optional)" />
+    <div class="mt-1 flex items-center gap-4">
+        @if ($user && $user->hasPhoto())
+            <img src="{{ $user->photoUrl() }}" alt="Current photo of {{ $user->name }}" class="w-16 h-16 rounded-full object-cover border border-gray-200">
+        @else
+            <div class="w-16 h-16 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-sm shrink-0">
+                {{ $user ? \App\Support\Initials::of($user->name) : '?' }}
+            </div>
+        @endif
+        <div class="min-w-0">
+            <input id="photo" name="photo" type="file" accept="image/jpeg,image/png"
+                   class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md shadow-sm file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-gray-100 file:text-gray-700 file:text-xs file:font-semibold file:uppercase file:tracking-widest">
+            <p class="text-xs text-gray-500 mt-1">JPEG or PNG only, up to 2 MB. It's cropped to a square and shrunk automatically. Without a photo, the initials are shown instead.</p>
+        </div>
+    </div>
+    @if ($user && $user->hasPhoto())
+        <label class="mt-2 inline-flex items-center text-sm text-gray-600">
+            <input type="hidden" name="remove_photo" value="0">
+            <input type="checkbox" name="remove_photo" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm">
+            <span class="ms-2">Remove current photo</span>
+        </label>
+    @endif
+    <x-input-error :messages="$errors->get('photo')" class="mt-2" />
+</div>
+
+<div>
     <x-input-label for="password" :value="$user ? 'New Password (leave blank to keep current)' : 'Password'" />
     <x-text-input id="password" name="password" type="password" class="block mt-1 w-full" :required="! $user" autocomplete="new-password" />
     <x-input-error :messages="$errors->get('password')" class="mt-2" />

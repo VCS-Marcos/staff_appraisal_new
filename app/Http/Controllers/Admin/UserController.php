@@ -8,12 +8,17 @@ use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Services\StaffPhotoProcessor;
 use App\Services\UserCsvImporter;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use RuntimeException;
 
 class UserController extends Controller
 {
@@ -43,14 +48,25 @@ class UserController extends Controller
         return view('admin.users.create', compact('managers'));
     }
 
-    public function store(StoreUserRequest $request): RedirectResponse
+    public function store(StoreUserRequest $request, StaffPhotoProcessor $photos): RedirectResponse
     {
-        $data = $request->validated();
+        $data = $request->safe()->except(['photo']);
         $data['password'] = Hash::make($data['password']);
 
-        $user = User::create($data);
+        $jpeg = $this->processPhoto($request, $photos);
 
-        AuditLog::record('user.created', $user, "Created staff account: {$user->name} ({$user->role->value})");
+        $user = DB::transaction(function () use ($data, $jpeg) {
+            $user = User::create($data);
+
+            if ($jpeg !== null) {
+                $this->storePhoto($user, $jpeg);
+            }
+
+            return $user;
+        });
+
+        AuditLog::record('user.created', $user, "Created staff account: {$user->name} ({$user->role->value})"
+            .($jpeg !== null ? ' — with photo' : ''));
 
         return redirect()->route('admin.users.index')->with('status', 'User created.');
     }
@@ -62,9 +78,10 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user', 'managers'));
     }
 
-    public function update(UpdateUserRequest $request, User $user): RedirectResponse
+    public function update(UpdateUserRequest $request, User $user, StaffPhotoProcessor $photos): RedirectResponse
     {
-        $data = $request->validated();
+        $data = $request->safe()->except(['photo', 'remove_photo']);
+        $jpeg = $this->processPhoto($request, $photos);
 
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -76,10 +93,39 @@ class UserController extends Controller
 
         $changed = array_values(array_diff(array_keys($user->getChanges()), ['updated_at']));
 
+        if ($jpeg !== null) {
+            $this->storePhoto($user, $jpeg);
+            $changed[] = 'photo';
+        } elseif ($request->boolean('remove_photo') && $user->hasPhoto()) {
+            $user->photo()->delete();
+            $user->forceFill(['photo_updated_at' => null])->save();
+            $changed[] = 'photo (removed)';
+        }
+
         AuditLog::record('user.updated', $user, "Updated staff account: {$user->name}"
             .($changed ? ' — fields: '.implode(', ', $changed) : ''));
 
         return redirect()->route('admin.users.index')->with('status', 'User updated.');
+    }
+
+    /** Decode + re-encode the uploaded photo, or null when none was sent. */
+    private function processPhoto(FormRequest $request, StaffPhotoProcessor $photos): ?string
+    {
+        if (! $request->hasFile('photo')) {
+            return null;
+        }
+
+        try {
+            return $photos->process($request->file('photo'));
+        } catch (RuntimeException $e) {
+            throw ValidationException::withMessages(['photo' => $e->getMessage()]);
+        }
+    }
+
+    private function storePhoto(User $user, string $jpeg): void
+    {
+        $user->photo()->updateOrCreate(['user_id' => $user->id], ['data' => $jpeg]);
+        $user->forceFill(['photo_updated_at' => now()])->save();
     }
 
     public function destroy(User $user): RedirectResponse

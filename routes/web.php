@@ -6,6 +6,7 @@ use App\Http\Controllers\AppraisalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\UserPhotoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,6 +15,8 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'active', 'verified', 'no-cache'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/staff/{user}/photo', [UserPhotoController::class, 'show'])->name('users.photo');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

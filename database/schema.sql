@@ -27,6 +27,7 @@ CREATE TABLE `users` (
   `position` varchar(150) DEFAULT NULL,
   `line_manager_id` bigint(20) unsigned DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `photo_updated_at` timestamp NULL DEFAULT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -34,6 +35,17 @@ CREATE TABLE `users` (
   UNIQUE KEY `users_email_unique` (`email`),
   KEY `users_line_manager_id_foreign` (`line_manager_id`),
   CONSTRAINT `users_line_manager_id_foreign` FOREIGN KEY (`line_manager_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `user_photos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `data` blob NOT NULL COMMENT 'Re-encoded JPEG bytes',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_photos_user_id_unique` (`user_id`),
+  CONSTRAINT `user_photos_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `appraisals` (

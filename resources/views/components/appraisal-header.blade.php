@@ -28,9 +28,13 @@
 
 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
     <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-sm shrink-0">
-            {{ strtoupper($initials) }}
-        </div>
+        @if ($employee->hasPhoto())
+            <img src="{{ $employee->photoUrl() }}" alt="{{ $employee->name }}" class="w-16 h-16 rounded-full object-cover border border-gray-200 shrink-0">
+        @else
+            <div class="w-16 h-16 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-base shrink-0">
+                {{ strtoupper($initials) }}
+            </div>
+        @endif
         <div>
             <div class="font-semibold text-gray-900">{{ $employee->name }}</div>
             <div class="text-sm text-gray-500">

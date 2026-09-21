@@ -54,8 +54,21 @@
         </table>
     </div>
 
+    @php
+        $photoData = $appraisal->employee->hasPhoto() && $appraisal->employee->photo
+            ? 'data:image/jpeg;base64,'.base64_encode($appraisal->employee->photo->data)
+            : null;
+    @endphp
     <div class="section">
         <div class="section-body">
+            <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+            @if ($photoData)
+                <td style="width: 84px; vertical-align: top; padding-right: 12px;">
+                    <img src="{{ $photoData }}" style="width: 72px; height: 72px; border: 1px solid #d1d5db;" alt="">
+                </td>
+            @endif
+            <td style="vertical-align: top;">
             <table class="fields">
                 <tr>
                     <td><span class="label">Employee Name</span>{{ $appraisal->employee->name }}</td>
@@ -65,6 +78,9 @@
                     <td><span class="label">Appraisal Date</span>{{ optional($appraisal->appraisal_date)->format('d M Y') ?? '—' }}</td>
                     <td><span class="label">Reviewer(s)</span>{{ $appraisal->reviewer->name }}</td>
                 </tr>
+            </table>
+            </td>
+            </tr>
             </table>
         </div>
     </div>

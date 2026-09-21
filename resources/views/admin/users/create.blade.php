@@ -6,7 +6,7 @@
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route('admin.users.store') }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
                     @include('admin.users._form', ['user' => null])
                     <div class="flex justify-end gap-3">
