@@ -14,18 +14,24 @@
     <x-input-error :messages="$errors->get('email')" class="mt-2" />
 </div>
 
-<div>
+<div x-data="{ preview: null }">
     <x-input-label for="photo" value="Staff Photo (optional)" />
     <div class="mt-1 flex items-center gap-4">
-        @if ($user && $user->hasPhoto())
-            <img src="{{ $user->photoUrl() }}" alt="Current photo of {{ $user->name }}" class="w-16 h-16 rounded-full object-cover border border-gray-200">
-        @else
-            <div class="w-16 h-16 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-sm shrink-0">
-                {{ $user ? \App\Support\Initials::of($user->name) : '?' }}
-            </div>
-        @endif
-        <div class="min-w-0">
+        <div class="w-20 h-20 shrink-0 rounded-full overflow-hidden border border-gray-200 bg-indigo-100 text-indigo-700 flex items-center justify-center">
+            <img x-show="preview" x-cloak :src="preview" alt="New photo preview" class="w-full h-full object-cover">
+            <template x-if="! preview">
+                @if ($user && $user->hasPhoto())
+                    <img src="{{ $user->photoUrl() }}" alt="Current photo of {{ $user->name }}" class="w-full h-full object-cover">
+                @elseif ($user)
+                    <span class="font-semibold text-lg">{{ \App\Support\Initials::of($user->name) }}</span>
+                @else
+                    <x-icon name="user-circle" class="w-10 h-10 text-indigo-400" />
+                @endif
+            </template>
+        </div>
+        <div class="min-w-0 flex-1">
             <input id="photo" name="photo" type="file" accept="image/jpeg,image/png"
+                   @change="const f = $event.target.files[0]; preview = f && ['image/jpeg','image/png'].includes(f.type) ? URL.createObjectURL(f) : null"
                    class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md shadow-sm file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-gray-100 file:text-gray-700 file:text-xs file:font-semibold file:uppercase file:tracking-widest">
             <p class="text-xs text-gray-500 mt-1">JPEG or PNG only, up to 2 MB. It's cropped to a square and shrunk automatically. Without a photo, the initials are shown instead.</p>
         </div>
