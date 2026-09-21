@@ -13,10 +13,15 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
+// Photos skip the blanket "no-cache" middleware below so the browser can keep them for
+// a day (privately) instead of re-downloading every avatar on every page view. The URL
+// carries a version stamp, so a replaced photo is fetched fresh.
+Route::middleware(['auth', 'active', 'verified'])->group(function () {
+    Route::get('/staff/{user}/photo', [UserPhotoController::class, 'show'])->name('users.photo');
+});
+
 Route::middleware(['auth', 'active', 'verified', 'no-cache'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    Route::get('/staff/{user}/photo', [UserPhotoController::class, 'show'])->name('users.photo');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
