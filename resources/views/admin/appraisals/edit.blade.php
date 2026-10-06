@@ -37,25 +37,38 @@
                         <p class="text-xs text-gray-500 mt-1">The year can't be changed. If it's wrong, delete this appraisal and create a new one.</p>
                     </div>
 
-                    <div>
-                        <x-input-label for="user_id" value="Employee being appraised" />
-                        <select id="user_id" name="user_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                            @foreach ($users as $u)
-                                <option value="{{ $u->id }}" @selected(old('user_id', $appraisal->user_id) == $u->id)>{{ $u->name }} ({{ ucfirst($u->role->value) }})</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('user_id')" class="mt-2" />
-                    </div>
+                    @if (auth()->user()->isAdmin())
+                        <div>
+                            <x-input-label for="user_id" value="Employee being appraised" />
+                            <select id="user_id" name="user_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                @foreach ($users as $u)
+                                    <option value="{{ $u->id }}" @selected(old('user_id', $appraisal->user_id) == $u->id)>{{ $u->name }} ({{ ucfirst($u->role->value) }})</option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('user_id')" class="mt-2" />
+                        </div>
 
-                    <div>
-                        <x-input-label for="reviewer_id" value="Reviewer" />
-                        <select id="reviewer_id" name="reviewer_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                            @foreach ($users as $u)
-                                <option value="{{ $u->id }}" @selected(old('reviewer_id', $appraisal->reviewer_id) == $u->id)>{{ $u->name }} ({{ ucfirst($u->role->value) }})</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('reviewer_id')" class="mt-2" />
-                    </div>
+                        <div>
+                            <x-input-label for="reviewer_id" value="Reviewer" />
+                            <select id="reviewer_id" name="reviewer_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                @foreach ($users as $u)
+                                    <option value="{{ $u->id }}" @selected(old('reviewer_id', $appraisal->reviewer_id) == $u->id)>{{ $u->name }} ({{ ucfirst($u->role->value) }})</option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('reviewer_id')" class="mt-2" />
+                        </div>
+                    @else
+                        <div>
+                            <x-input-label value="Employee being appraised" />
+                            <p class="mt-1 text-sm text-gray-800">{{ $appraisal->employee->name }}</p>
+                        </div>
+
+                        <div>
+                            <x-input-label value="Reviewer" />
+                            <p class="mt-1 text-sm text-gray-800">{{ $appraisal->reviewer->name }} (you)</p>
+                            <p class="text-xs text-gray-500 mt-1">Only an admin can change the employee or reviewer. You can update the appraisal date and the targets.</p>
+                        </div>
+                    @endif
 
                     <div>
                         <x-input-label for="appraisal_date" value="Appraisal Date (optional)" />
@@ -91,7 +104,7 @@
                     </div>
 
                     <div class="flex flex-wrap justify-end gap-3">
-                        <a href="{{ route('admin.appraisals.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                        <a href="{{ auth()->user()->isAdmin() ? route('admin.appraisals.index') : route('appraisals.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                             Cancel
                         </a>
                         <x-primary-button>Save Changes</x-primary-button>

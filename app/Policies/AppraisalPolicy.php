@@ -38,6 +38,23 @@ class AppraisalPolicy
             || ($user->isReviewer() && $appraisal->reviewer_id === $user->id);
     }
 
+    /**
+     * Edit the appraisal's setup (date and Section 1 targets). Admins: always. Reviewers:
+     * only an appraisal they created themselves, while they are still its reviewer, and
+     * only before the employee has submitted — after that the admin must send it back.
+     */
+    public function edit(User $user, Appraisal $appraisal): bool
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        return $user->isReviewer()
+            && $appraisal->created_by === $user->id
+            && $appraisal->reviewer_id === $user->id
+            && in_array($appraisal->status, [AppraisalStatus::Draft, AppraisalStatus::PendingEmployee], true);
+    }
+
     public function update(User $user, Appraisal $appraisal): bool
     {
         return $user->isAdmin()

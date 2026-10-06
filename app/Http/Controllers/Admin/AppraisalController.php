@@ -106,10 +106,11 @@ class AppraisalController extends Controller
         $data = $request->validated();
         $openNow = ($data['intent'] ?? 'draft') === 'open';
 
-        $appraisal = DB::transaction(function () use ($data, $openNow) {
+        $appraisal = DB::transaction(function () use ($data, $openNow, $request) {
             $appraisal = Appraisal::create([
                 'user_id' => $data['user_id'],
                 'reviewer_id' => $data['reviewer_id'],
+                'created_by' => $request->user()->id,
                 'year' => $data['year'],
                 'appraisal_date' => $data['appraisal_date'] ?? null,
                 'status' => $openNow ? AppraisalStatus::PendingEmployee : AppraisalStatus::Draft,
@@ -143,7 +144,7 @@ class AppraisalController extends Controller
 
     public function edit(Appraisal $appraisal): View
     {
-        $this->authorize('update', $appraisal);
+        $this->authorize('edit', $appraisal);
 
         $appraisal->load(['employee', 'reviewer', 'currentTargets']);
         $users = User::where('is_active', true)->orderBy('name')->get();
@@ -168,11 +169,11 @@ class AppraisalController extends Controller
         $appraisal->load('employee');
 
         AuditLog::record('appraisal.updated', $appraisal, sprintf(
-            'Edited appraisal for %s (%s)',
-            $appraisal->employee->name, $appraisal->year,
+            'Edited appraisal for %s (%s)%s',
+            $appraisal->employee->name, $appraisal->year, $this->creatorNote($request),
         ));
 
-        return redirect()->route('admin.appraisals.index')->with('status', 'Appraisal updated.');
+        return redirect()->route($this->indexRoute($request))->with('status', 'Appraisal updated.');
     }
 
     public function destroy(Appraisal $appraisal): RedirectResponse

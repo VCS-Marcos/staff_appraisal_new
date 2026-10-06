@@ -52,6 +52,7 @@ CREATE TABLE `appraisals` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint(20) unsigned NOT NULL,
   `reviewer_id` bigint(20) unsigned NOT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
   `year` smallint(5) unsigned NOT NULL,
   `appraisal_date` date DEFAULT NULL,
   `self_reflection` text DEFAULT NULL,
@@ -69,6 +70,7 @@ CREATE TABLE `appraisals` (
   KEY `appraisals_reviewer_id_foreign` (`reviewer_id`),
   KEY `idx_appraisals_status` (`status`),
   KEY `idx_appraisals_completion_mode` (`completion_mode`),
+  CONSTRAINT `appraisals_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `appraisals_reviewer_id_foreign` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`id`),
   CONSTRAINT `appraisals_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

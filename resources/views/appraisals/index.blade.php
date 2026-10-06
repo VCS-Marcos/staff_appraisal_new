@@ -39,6 +39,9 @@
                                             @can('open', $appraisal)
                                                 <x-action-menu.form-item :action="route('admin.appraisals.open', $appraisal)" method="PATCH" icon="unlock" variant="success">Open for Employee</x-action-menu.form-item>
                                             @endcan
+                                            @can('edit', $appraisal)
+                                                <x-action-menu.item :href="route('admin.appraisals.edit', $appraisal)" icon="pencil">Edit</x-action-menu.item>
+                                            @endcan
                                             @can('updateAsEmployee', $appraisal)
                                                 <x-action-menu.item :href="route('appraisals.edit', $appraisal)" icon="pencil" variant="warning">Complete In Person</x-action-menu.item>
                                             @endcan

@@ -9,7 +9,17 @@ class UpdateAppraisalRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('update', $this->route('appraisal'));
+        return $this->user()->can('edit', $this->route('appraisal'));
+    }
+
+    protected function prepareForValidation(): void
+    {
+        // Only an admin may change who is appraised or who reviews; for a reviewer these
+        // are pinned to the current values so a tampered request can't reassign them.
+        if (! $this->user()->isAdmin()) {
+            $appraisal = $this->route('appraisal');
+            $this->merge(['user_id' => $appraisal->user_id, 'reviewer_id' => $appraisal->reviewer_id]);
+        }
     }
 
     public function rules(): array
