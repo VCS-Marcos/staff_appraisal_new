@@ -106,11 +106,10 @@ class AppraisalController extends Controller
         $data = $request->validated();
         $openNow = ($data['intent'] ?? 'draft') === 'open';
 
-        $appraisal = DB::transaction(function () use ($data, $openNow, $request) {
+        $appraisal = DB::transaction(function () use ($data, $openNow) {
             $appraisal = Appraisal::create([
                 'user_id' => $data['user_id'],
                 'reviewer_id' => $data['reviewer_id'],
-                'created_by' => $request->user()->id,
                 'year' => $data['year'],
                 'appraisal_date' => $data['appraisal_date'] ?? null,
                 'status' => $openNow ? AppraisalStatus::PendingEmployee : AppraisalStatus::Draft,

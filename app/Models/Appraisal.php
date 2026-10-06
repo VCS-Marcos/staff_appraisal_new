@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'user_id', 'reviewer_id', 'created_by', 'year', 'appraisal_date',
+    'user_id', 'reviewer_id', 'year', 'appraisal_date',
     'self_reflection', 'reviewer_comments', 'overall_rating',
     'next_review_date', 'status', 'completion_mode', 'employee_signed_at', 'reviewer_signed_at',
 ])]
