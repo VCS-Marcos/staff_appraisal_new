@@ -35,4 +35,9 @@ env:
   FILESYSTEM_DISK: local
   QUEUE_CONNECTION: sync
   CACHE_STORE: database
-  MAIL_MAILER: log
+  MAIL_MAILER: smtp
+  MAIL_SCHEME: smtp
+  MAIL_HOST: smtp.gmail.com
+  MAIL_PORT: "587"
+  MAIL_FROM_NAME: "Staff Appraisal"
+  # MAIL_USERNAME, MAIL_PASSWORD and MAIL_FROM_ADDRESS are Wasmer app secrets (not stored here).
