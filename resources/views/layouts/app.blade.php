@@ -32,6 +32,14 @@
             @endisset
 
             <!-- Page Content -->
+            @if (session('warning_recipients'))
+                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 pt-6">
+                    <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-md" role="alert">
+                        Your change was saved, but the email notification could not be sent to {{ implode(', ', session('warning_recipients')) }}. Please let them know directly.
+                    </div>
+                </div>
+            @endif
+
             <main>
                 {{ $slot }}
             </main>

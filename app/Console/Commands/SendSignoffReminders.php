@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\AppraisalStatus;
 use App\Models\Appraisal;
 use App\Notifications\AppraisalSignoffReminder;
+use App\Support\SafeNotify;
 use Illuminate\Console\Command;
 
 class SendSignoffReminders extends Command
@@ -23,13 +24,15 @@ class SendSignoffReminders extends Command
 
         foreach ($appraisals as $appraisal) {
             if ($appraisal->employee_signed_at === null) {
-                $appraisal->employee->notify(new AppraisalSignoffReminder($appraisal));
-                $sent++;
+                if (SafeNotify::send($appraisal->employee, new AppraisalSignoffReminder($appraisal))) {
+                    $sent++;
+                }
             }
 
             if ($appraisal->reviewer_signed_at === null) {
-                $appraisal->reviewer->notify(new AppraisalSignoffReminder($appraisal));
-                $sent++;
+                if (SafeNotify::send($appraisal->reviewer, new AppraisalSignoffReminder($appraisal))) {
+                    $sent++;
+                }
             }
         }
 

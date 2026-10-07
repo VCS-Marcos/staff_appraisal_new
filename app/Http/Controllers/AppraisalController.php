@@ -15,6 +15,7 @@ use App\Models\AppraisalTarget;
 use App\Models\AuditLog;
 use App\Notifications\AppraisalReadyForSignoff;
 use App\Notifications\AppraisalSubmittedForReview;
+use App\Support\SafeNotify;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -103,7 +104,7 @@ class AppraisalController extends Controller
 
         if ($request->input('intent') === 'submit') {
             $appraisal->update(['status' => AppraisalStatus::PendingReviewer]);
-            $appraisal->reviewer->notify(new AppraisalSubmittedForReview($appraisal));
+            SafeNotify::send($appraisal->reviewer, new AppraisalSubmittedForReview($appraisal));
 
             if ($actingAsEmployee) {
                 AuditLog::record('appraisal.submitted_by_employee', $appraisal, 'Employee submitted their section — now awaiting reviewer');
@@ -162,8 +163,8 @@ class AppraisalController extends Controller
 
         if ($request->input('intent') === 'submit') {
             $appraisal->update(['status' => AppraisalStatus::PendingSignoff]);
-            $appraisal->employee->notify(new AppraisalReadyForSignoff($appraisal));
-            $appraisal->reviewer->notify(new AppraisalReadyForSignoff($appraisal));
+            SafeNotify::send($appraisal->employee, new AppraisalReadyForSignoff($appraisal));
+            SafeNotify::send($appraisal->reviewer, new AppraisalReadyForSignoff($appraisal));
 
             AuditLog::record('appraisal.submitted_by_reviewer', $appraisal, 'Reviewer submitted the review — now awaiting sign-off');
 

@@ -13,6 +13,7 @@ use App\Models\AuditLog;
 use App\Models\User;
 use App\Notifications\AppraisalOpened;
 use App\Notifications\AppraisalSubmittedForReview;
+use App\Support\SafeNotify;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -123,7 +124,7 @@ class AppraisalController extends Controller
         $appraisal->load('employee');
 
         if ($openNow) {
-            $appraisal->employee->notify(new AppraisalOpened($appraisal));
+            SafeNotify::send($appraisal->employee, new AppraisalOpened($appraisal));
             AuditLog::record('appraisal.created', $appraisal, sprintf(
                 'Created and opened appraisal for %s (%s) — awaiting employee%s',
                 $appraisal->employee->name, $appraisal->year, $this->creatorNote($request),
@@ -200,7 +201,7 @@ class AppraisalController extends Controller
 
         if ($appraisal->status === AppraisalStatus::Draft) {
             $appraisal->update(['status' => AppraisalStatus::PendingEmployee]);
-            $appraisal->employee->notify(new AppraisalOpened($appraisal));
+            SafeNotify::send($appraisal->employee, new AppraisalOpened($appraisal));
 
             AuditLog::record('appraisal.opened', $appraisal, sprintf(
                 'Opened appraisal for %s — now awaiting employee%s', $appraisal->employee->name, $this->creatorNote($request),
@@ -235,9 +236,9 @@ class AppraisalController extends Controller
         $appraisal->load(['employee', 'reviewer']);
 
         if ($toStatus === AppraisalStatus::PendingEmployee) {
-            $appraisal->employee->notify(new AppraisalOpened($appraisal));
+            SafeNotify::send($appraisal->employee, new AppraisalOpened($appraisal));
         } else {
-            $appraisal->reviewer->notify(new AppraisalSubmittedForReview($appraisal));
+            SafeNotify::send($appraisal->reviewer, new AppraisalSubmittedForReview($appraisal));
         }
 
         AuditLog::record('appraisal.reopened', $appraisal, sprintf(
