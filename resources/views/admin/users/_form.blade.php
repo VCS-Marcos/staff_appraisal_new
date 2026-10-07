@@ -79,7 +79,7 @@
         <option value="">— None —</option>
         @foreach ($managers as $manager)
             <option value="{{ $manager->id }}" @selected((string) old('line_manager_id', $user->line_manager_id ?? '') === (string) $manager->id)>
-                {{ $manager->name }} ({{ ucfirst($manager->role->value) }})
+                {{ $manager->name }} ({{ ucfirst($manager->role->value) }}){{ $manager->is_active ? '' : ' — inactive' }}
             </option>
         @endforeach
     </select>
