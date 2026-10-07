@@ -104,7 +104,11 @@ class AppraisalController extends Controller
 
         if ($request->input('intent') === 'submit') {
             $appraisal->update(['status' => AppraisalStatus::PendingReviewer]);
-            SafeNotify::send($appraisal->reviewer, new AppraisalSubmittedForReview($appraisal));
+
+            // Skip the email when the reviewer is the one submitting (in-person session) — they already know.
+            if ($request->user()->id !== $appraisal->reviewer_id) {
+                SafeNotify::send($appraisal->reviewer, new AppraisalSubmittedForReview($appraisal));
+            }
 
             if ($actingAsEmployee) {
                 AuditLog::record('appraisal.submitted_by_employee', $appraisal, 'Employee submitted their section — now awaiting reviewer');
@@ -163,8 +167,8 @@ class AppraisalController extends Controller
 
         if ($request->input('intent') === 'submit') {
             $appraisal->update(['status' => AppraisalStatus::PendingSignoff]);
+            // Only the employee needs telling; the reviewer has just submitted this themselves.
             SafeNotify::send($appraisal->employee, new AppraisalReadyForSignoff($appraisal));
-            SafeNotify::send($appraisal->reviewer, new AppraisalReadyForSignoff($appraisal));
 
             AuditLog::record('appraisal.submitted_by_reviewer', $appraisal, 'Reviewer submitted the review — now awaiting sign-off');
 
