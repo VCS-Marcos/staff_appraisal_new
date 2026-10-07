@@ -35,7 +35,8 @@ env:
   FILESYSTEM_DISK: local
   QUEUE_CONNECTION: sync
   CACHE_STORE: database
-  MAIL_MAILER: smtp
+  # "log" = emails are written to the log, nothing is sent. Change to "smtp" at go-live.
+  MAIL_MAILER: log
   MAIL_SCHEME: smtp
   MAIL_HOST: smtp.gmail.com
   MAIL_PORT: "587"
