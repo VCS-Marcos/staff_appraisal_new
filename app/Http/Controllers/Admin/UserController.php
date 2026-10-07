@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ImportUsersRequest;
 use App\Http\Requests\Admin\StoreUserRequest;
@@ -32,11 +33,14 @@ class UserController extends Controller
                     ->orWhere('position', 'like', $term));
             })
             ->when($request->filled('line_manager_id'), fn ($q) => $q->where('line_manager_id', $request->integer('line_manager_id')))
+            ->when(UserRole::tryFrom((string) $request->input('role')), fn ($q, $role) => $q->where('role', $role))
             ->orderBy('name')
             ->paginate(20)
             ->withQueryString();
 
-        $managers = User::where('is_active', true)->orderBy('name')->get();
+        // Only people who currently have at least one direct report, so every choice
+        // returns results. Includes deactivated managers so their orphaned reports can still be found.
+        $managers = User::whereHas('directReports')->orderBy('name')->get();
 
         return view('admin.users.index', compact('users', 'managers'));
     }

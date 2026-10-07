@@ -28,14 +28,20 @@
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, position or email..."
                                    class="w-full pl-9 border-gray-300 rounded-md shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
-                        <select name="line_manager_id" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
-                            <option value="">All Staff</option>
+                        <select name="role" aria-label="Role" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
+                            <option value="">All roles</option>
+                            @foreach (\App\Enums\UserRole::cases() as $role)
+                                <option value="{{ $role->value }}" @selected(request('role') === $role->value)>{{ ucfirst($role->value) }}</option>
+                            @endforeach
+                        </select>
+                        <select name="line_manager_id" aria-label="Line manager" class="border-gray-300 rounded-md shadow-sm text-sm" onchange="this.form.submit()">
+                            <option value="">Any line manager</option>
                             @foreach ($managers as $manager)
-                                <option value="{{ $manager->id }}" @selected(request('line_manager_id') == $manager->id)>{{ $manager->name }}</option>
+                                <option value="{{ $manager->id }}" @selected(request('line_manager_id') == $manager->id)>{{ $manager->name }}{{ $manager->is_active ? '' : ' (inactive)' }}</option>
                             @endforeach
                         </select>
                         <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50">Search</button>
-                        @if (request('search') || request('line_manager_id'))
+                        @if (request('search') || request('line_manager_id') || request('role'))
                             <a href="{{ route('admin.users.index') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Clear</a>
                         @endif
                     </form>
