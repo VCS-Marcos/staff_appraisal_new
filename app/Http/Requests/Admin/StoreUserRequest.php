@@ -26,7 +26,7 @@ class StoreUserRequest extends FormRequest
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', new Enum(UserRole::class)],
             'position' => ['nullable', 'string', 'max:150'],
-            'line_manager_id' => ['nullable', 'integer', Rule::exists('users', 'id')],
+            'line_manager_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where('role', UserRole::Reviewer->value)],
             'is_active' => ['boolean'],
             'photo' => self::photoRules(),
         ];

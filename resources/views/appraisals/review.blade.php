@@ -45,9 +45,6 @@
                 @method('PUT')
 
                 <div class="flex flex-wrap items-center justify-end gap-3">
-                    <a href="{{ route('appraisals.pdf', $appraisal) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
-                        <x-icon name="download" class="w-3.5 h-3.5" /> PDF
-                    </a>
                     <button type="submit" name="intent" value="save" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                         Save Progress
                     </button>

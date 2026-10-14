@@ -10,6 +10,9 @@ enum AppraisalStatus: string
     case PendingSignoff = 'pending_signoff';
     case Completed = 'completed';
 
+    /** Every status that means "started but not finished" (used by the "In Progress" list filter). */
+    public const IN_PROGRESS = ['pending_employee', 'pending_reviewer', 'pending_signoff'];
+
     public function label(): string
     {
         return match ($this) {

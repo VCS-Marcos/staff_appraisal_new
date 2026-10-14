@@ -51,7 +51,7 @@
                         <div>
                             <x-input-label for="reviewer_id" value="Reviewer" />
                             <select id="reviewer_id" name="reviewer_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                @foreach ($users as $u)
+                                @foreach ($reviewers as $u)
                                     <option value="{{ $u->id }}" @selected(old('reviewer_id', $appraisal->reviewer_id) == $u->id)>{{ $u->name }} ({{ ucfirst($u->role->value) }})</option>
                                 @endforeach
                             </select>

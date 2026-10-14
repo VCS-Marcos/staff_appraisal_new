@@ -152,7 +152,7 @@ class ReportController extends Controller
 
         return Response::streamDownload(function () use ($logs) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['When', 'User', 'Action', 'Entity', 'Entity ID', 'Description', 'IP Address']);
+            fputcsv($out, ['When', 'User', 'Action', 'Entity', 'Entity ID', 'Description']);
 
             foreach ($logs as $log) {
                 fputcsv($out, [
@@ -162,7 +162,6 @@ class ReportController extends Controller
                     $log->entity_type,
                     $log->entity_id,
                     $log->description,
-                    $log->ip_address,
                 ]);
             }
 

@@ -54,6 +54,26 @@ class User extends Authenticatable
     }
 
     /**
+     * Accounts that can be picked as a line manager / reviewer: active reviewer-role accounts only.
+     * Pass the id of a currently-assigned person to keep them selectable even if they are
+     * deactivated or no longer a reviewer, so re-saving a form never silently changes them.
+     */
+    public static function reviewerOptions(?int $alsoInclude = null, ?int $excluding = null): \Illuminate\Support\Collection
+    {
+        return static::query()
+            ->where(function (Builder $q) use ($alsoInclude) {
+                $q->where(fn (Builder $r) => $r->where('role', UserRole::Reviewer)->where('is_active', true));
+
+                if ($alsoInclude !== null) {
+                    $q->orWhere('id', $alsoInclude);
+                }
+            })
+            ->when($excluding !== null, fn (Builder $q) => $q->where('id', '!=', $excluding))
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
      * Staff this user may create appraisals for: everyone for an admin; for a
      * reviewer, only their direct reports (line manager) and anyone they are
      * already the assigned reviewer for. Never themselves.

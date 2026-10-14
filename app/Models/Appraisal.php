@@ -70,6 +70,11 @@ class Appraisal extends Model
         return $this->hasMany(ProfessionalDevelopment::class)->orderBy('activity_date');
     }
 
+    public function isCompleted(): bool
+    {
+        return $this->status === AppraisalStatus::Completed;
+    }
+
     public function isFullySigned(): bool
     {
         return $this->employee_signed_at !== null && $this->reviewer_signed_at !== null;

@@ -33,7 +33,11 @@ class UpdateAppraisalRequest extends FormRequest
                     ->where('year', $appraisal->year)
                     ->ignore($appraisal->id),
             ],
-            'reviewer_id' => ['required', 'integer', 'different:user_id', Rule::exists('users', 'id')],
+            // Reviewer accounts only — but keep the current reviewer valid so re-saving never fails.
+            'reviewer_id' => [
+                'required', 'integer', 'different:user_id',
+                Rule::exists('users', 'id')->where(fn ($q) => $q->where('role', 'reviewer')->orWhere('id', $appraisal->reviewer_id)),
+            ],
             'appraisal_date' => ['nullable', 'date'],
             'targets' => ['array'],
             'targets.*.id' => ['nullable', 'integer'],

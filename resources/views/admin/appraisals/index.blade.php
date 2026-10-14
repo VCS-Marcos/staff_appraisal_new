@@ -99,7 +99,9 @@
                                         @can('reopen', $appraisal)
                                             <x-action-menu.item :href="route('admin.appraisals.reopen', $appraisal)" icon="arrow-uturn-left" variant="warning">Send Back</x-action-menu.item>
                                         @endcan
-                                        <x-action-menu.item :href="route('appraisals.pdf', $appraisal)" icon="download">Download</x-action-menu.item>
+                                        @if ($appraisal->isCompleted())
+                                            <x-action-menu.item :href="route('appraisals.pdf', $appraisal)" icon="download">Download PDF</x-action-menu.item>
+                                        @endif
                                         <div class="my-1 border-t border-gray-100"></div>
                                         <x-confirm-delete menu-item :action="route('admin.appraisals.destroy', $appraisal)"
                                             prompt="Also removes its targets & CPD entries." />

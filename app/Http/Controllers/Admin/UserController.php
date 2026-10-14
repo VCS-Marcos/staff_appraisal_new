@@ -47,7 +47,7 @@ class UserController extends Controller
 
     public function create(): View
     {
-        $managers = User::where('is_active', true)->orderBy('name')->get();
+        $managers = User::reviewerOptions();
 
         return view('admin.users.create', compact('managers'));
     }
@@ -77,12 +77,9 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        // Active staff, plus this person's current manager even if deactivated — otherwise the
-        // dropdown would show "None" and saving the form would silently clear their manager.
-        $managers = User::where('id', '!=', $user->id)
-            ->where(fn ($q) => $q->where('is_active', true)->orWhere('id', $user->line_manager_id))
-            ->orderBy('name')
-            ->get();
+        // Reviewer accounts only, plus this person's current manager even if deactivated or not a
+        // reviewer — otherwise the dropdown would show "None" and saving would silently clear them.
+        $managers = User::reviewerOptions($user->line_manager_id, excluding: $user->id);
 
         return view('admin.users.edit', compact('user', 'managers'));
     }

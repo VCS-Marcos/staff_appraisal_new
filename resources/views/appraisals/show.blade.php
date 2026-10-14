@@ -15,9 +15,11 @@
             <x-appraisal-header :appraisal="$appraisal" />
 
             <div class="flex flex-wrap items-center justify-end gap-3">
+                @if ($appraisal->isCompleted())
                 <a href="{{ route('appraisals.pdf', $appraisal) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                     <x-icon name="download" class="w-3.5 h-3.5" /> PDF
                 </a>
+                @endif
                 @can('updateAsEmployee', $appraisal)
                     <a href="{{ route('appraisals.edit', $appraisal) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                         {{ $appraisal->user_id === auth()->id() ? 'Complete My Section' : 'Complete In Person' }}

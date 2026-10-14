@@ -97,9 +97,10 @@ class AppraisalController extends Controller
     {
         $years = $this->availableYears();
         $users = $request->user()->appraisableStaff()->orderBy('name')->get();
+        $reviewers = User::reviewerOptions();
         $selectedYear = $request->integer('year') ?: $years->first();
 
-        return view('admin.appraisals.create', compact('years', 'users', 'selectedYear'));
+        return view('admin.appraisals.create', compact('years', 'users', 'reviewers', 'selectedYear'));
     }
 
     public function store(StoreAppraisalRequest $request): RedirectResponse
@@ -148,8 +149,9 @@ class AppraisalController extends Controller
 
         $appraisal->load(['employee', 'reviewer', 'currentTargets']);
         $users = User::where('is_active', true)->orderBy('name')->get();
+        $reviewers = User::reviewerOptions($appraisal->reviewer_id);
 
-        return view('admin.appraisals.edit', compact('appraisal', 'users'));
+        return view('admin.appraisals.edit', compact('appraisal', 'users', 'reviewers'));
     }
 
     public function update(UpdateAppraisalRequest $request, Appraisal $appraisal): RedirectResponse

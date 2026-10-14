@@ -52,7 +52,6 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Details</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -65,11 +64,10 @@
                                         {{ $log->description ?? '—' }}
                                         <span class="block text-xs text-gray-400">{{ $log->entity_type }} #{{ $log->entity_id }}</span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-400">{{ $log->ip_address ?? '—' }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">No activity recorded for this filter.</td>
+                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">No activity recorded for this filter.</td>
                                 </tr>
                             @endforelse
                         </tbody>

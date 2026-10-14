@@ -17,6 +17,7 @@ use App\Notifications\AppraisalReadyForSignoff;
 use App\Notifications\AppraisalSubmittedForReview;
 use App\Support\SafeNotify;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -30,19 +31,46 @@ class AppraisalController extends Controller
     {
         $user = $request->user();
 
-        $myAppraisals = Appraisal::query()
-            ->where('user_id', $user->id)
-            ->orderByDesc('created_at')
-            ->get();
+        // Each list has its own filter/page parameters (m_* / t_*) so filtering one never resets the other.
+        $mine = Appraisal::query()->where('user_id', $user->id);
+        $myYears = (clone $mine)->distinct()->orderByDesc('year')->pluck('year');
+        $myAppraisals = $this->applyListFilters($mine, $request, 'm')
+            ->orderByDesc('year')->orderByDesc('created_at')
+            ->paginate(10, ['*'], 'mine_page')
+            ->withQueryString();
 
-        $teamAppraisals = $user->isReviewer() || $user->isAdmin()
-            ? Appraisal::with('employee')
-                ->where('reviewer_id', $user->id)
-                ->orderByDesc('created_at')
-                ->get()
-            : collect();
+        $team = Appraisal::query()->where('reviewer_id', $user->id);
+        $hasTeam = ($user->isReviewer() || $user->isAdmin()) && (clone $team)->exists();
+        $teamYears = collect();
+        $teamAppraisals = null;
 
-        return view('appraisals.index', compact('myAppraisals', 'teamAppraisals'));
+        if ($hasTeam) {
+            $teamYears = (clone $team)->distinct()->orderByDesc('year')->pluck('year');
+            $teamAppraisals = $this->applyListFilters($team->with('employee'), $request, 't', withSearch: true)
+                ->orderByDesc('year')->orderByDesc('created_at')
+                ->paginate(15, ['*'], 'team_page')
+                ->withQueryString();
+        }
+
+        return view('appraisals.index', compact('myAppraisals', 'myYears', 'teamAppraisals', 'teamYears', 'hasTeam'));
+    }
+
+    /**
+     * Year / status (and, for the team list, employee-name) filters. $prefix namespaces the query
+     * parameters, e.g. t_year, t_status, t_search.
+     */
+    private function applyListFilters(Builder $query, Request $request, string $prefix, bool $withSearch = false): Builder
+    {
+        $status = (string) $request->input("{$prefix}_status");
+
+        return $query
+            ->when($request->filled("{$prefix}_year"), fn ($q) => $q->where('year', $request->integer("{$prefix}_year")))
+            ->when($status === 'in_progress', fn ($q) => $q->whereIn('status', AppraisalStatus::IN_PROGRESS))
+            ->when(AppraisalStatus::tryFrom($status), fn ($q, $s) => $q->where('status', $s))
+            ->when($withSearch && $request->filled("{$prefix}_search"), function ($q) use ($request, $prefix) {
+                $term = '%'.$request->string("{$prefix}_search").'%';
+                $q->whereHas('employee', fn ($e) => $e->where('name', 'like', $term));
+            });
     }
 
     public function show(Appraisal $appraisal): View
@@ -262,6 +290,9 @@ class AppraisalController extends Controller
     public function downloadPdf(Appraisal $appraisal): Response
     {
         $this->authorize('view', $appraisal);
+
+        // The PDF is the final record, so it is only available once the appraisal is completed.
+        abort_unless($appraisal->isCompleted(), 403, 'The PDF is available once the appraisal is completed.');
 
         $appraisal->load(['employee', 'reviewer', 'currentTargets', 'nextYearTargets', 'professionalDevelopment']);
 

@@ -28,7 +28,11 @@ class UpdateUserRequest extends FormRequest
             'password' => ['nullable', 'confirmed', Password::defaults()],
             'role' => ['required', new Enum(UserRole::class)],
             'position' => ['nullable', 'string', 'max:150'],
-            'line_manager_id' => ['nullable', 'integer', Rule::exists('users', 'id'), 'not_in:'.$user->id],
+            'line_manager_id' => [
+                'nullable', 'integer', 'not_in:'.$user->id,
+                // Reviewer accounts only — but keep the existing manager valid so re-saving never fails.
+                Rule::exists('users', 'id')->where(fn ($q) => $q->where('role', UserRole::Reviewer->value)->orWhere('id', $user->line_manager_id)),
+            ],
             'is_active' => ['boolean'],
             'photo' => self::photoRules(),
             'remove_photo' => ['boolean'],
