@@ -33,7 +33,7 @@ class StoreAppraisalRequest extends FormRequest
                     : Rule::in($user->appraisableStaff()->pluck('id')->all()),
                 Rule::unique('appraisals', 'user_id')->where('year', $this->input('year')),
             ],
-            'reviewer_id' => ['required', 'integer', 'different:user_id', Rule::exists('users', 'id')->where('role', 'reviewer')],
+            'reviewer_id' => ['required', 'integer', 'different:user_id', Rule::exists('users', 'id')->whereIn('role', ['reviewer', 'admin'])],
             'year' => ['required', 'integer', 'between:2000,2100'],
             'appraisal_date' => ['nullable', 'date'],
             'intent' => ['nullable', 'string', 'in:draft,open'],

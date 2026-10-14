@@ -54,7 +54,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Accounts that can be picked as a line manager / reviewer: active reviewer-role accounts only.
+     * Accounts that can be picked as a line manager / reviewer: active reviewer and admin accounts (never plain employees).
      * Pass the id of a currently-assigned person to keep them selectable even if they are
      * deactivated or no longer a reviewer, so re-saving a form never silently changes them.
      */
@@ -62,7 +62,7 @@ class User extends Authenticatable
     {
         return static::query()
             ->where(function (Builder $q) use ($alsoInclude) {
-                $q->where(fn (Builder $r) => $r->where('role', UserRole::Reviewer)->where('is_active', true));
+                $q->where(fn (Builder $r) => $r->whereIn('role', [UserRole::Reviewer, UserRole::Admin])->where('is_active', true));
 
                 if ($alsoInclude !== null) {
                     $q->orWhere('id', $alsoInclude);
