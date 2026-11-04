@@ -65,8 +65,9 @@
                     <div x-show="tab === 'targets'">
                         <p class="text-xs text-gray-500 mb-4">Employee's responses for this appraisal.</p>
                         <div class="space-y-4">
-                            @foreach ($appraisal->currentTargets as $target)
+                            @foreach ($appraisal->currentTargets as $i => $target)
                                 <div class="border border-gray-200 rounded-md p-4">
+                                    <input type="hidden" name="targets[{{ $i }}][id]" value="{{ $target->id }}">
                                     <div class="text-sm font-semibold text-gray-700">Target {{ $target->target_number }}:</div>
                                     <p class="text-sm text-gray-800 mt-1 whitespace-pre-line">{{ $target->target_text ?: '—' }}</p>
                                     @if ($target->action_text || $target->success_criteria)
@@ -79,8 +80,14 @@
                                     @endif
                                     <div class="mt-2 text-sm"><span class="text-gray-500">Target Met:</span> <span class="font-medium">{{ $target->target_met ? ucfirst($target->target_met->value) : '—' }}</span></div>
                                     @if ($target->comments)
-                                        <div class="mt-1 text-sm"><span class="text-gray-500">Employee Comments:</span> {{ $target->comments }}</div>
+                                        <div class="mt-1 text-sm"><span class="text-gray-500">Staff Comments:</span> {{ $target->comments }}</div>
                                     @endif
+
+                                    <div class="mt-4 pt-3 border-t border-gray-100">
+                                        <x-input-label :for="'reviewer_comments_'.$i" value="Reviewer Comments (optional)" />
+                                        <textarea id="reviewer_comments_{{ $i }}" name="targets[{{ $i }}][reviewer_comments]" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old("targets.$i.reviewer_comments", $target->reviewer_comments) }}</textarea>
+                                        <x-input-error :messages="$errors->get(\"targets.$i.reviewer_comments\")" class="mt-2" />
+                                    </div>
                                 </div>
                             @endforeach
                         </div>

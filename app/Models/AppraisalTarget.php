@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'appraisal_id', 'target_type', 'target_number', 'target_text',
-    'target_met', 'comments', 'action_text', 'success_criteria',
+    'target_met', 'comments', 'reviewer_comments', 'action_text', 'success_criteria',
 ])]
 class AppraisalTarget extends Model
 {

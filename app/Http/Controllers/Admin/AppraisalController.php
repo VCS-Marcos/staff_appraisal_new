@@ -286,7 +286,7 @@ class AppraisalController extends Controller
 
     /**
      * Replace an appraisal's Section 1 (current) targets from form input.
-     * When $preserveResponses is set, any employee-entered target_met / comments
+     * When $preserveResponses is set, any employee-entered target_met / comments and reviewer comments
      * are carried over onto the matching target row (matched by hidden id).
      *
      * @param  array<int, array<string, mixed>>  $targets
@@ -319,6 +319,7 @@ class AppraisalController extends Controller
                 'success_criteria' => $input['success_criteria'] ?? null,
                 'target_met' => $previous?->target_met,
                 'comments' => $previous?->comments,
+                'reviewer_comments' => $previous?->reviewer_comments,
             ]);
         }
     }

@@ -26,7 +26,11 @@
                         <span class="font-medium">{{ $target->target_met ? ucfirst($target->target_met->value) : 'Not yet answered' }}</span>
                     </div>
                     @if ($target->comments)
-                        <div class="mt-1 text-sm"><span class="text-gray-500">Comments:</span> {{ $target->comments }}</div>
+                        <div class="mt-1 text-sm"><span class="text-gray-500">Staff Comments:</span> <span class="whitespace-pre-line">{{ $target->comments }}</span></div>
+                    @endif
+
+                    @if ($target->reviewer_comments)
+                        <div class="mt-1 text-sm"><span class="text-gray-500">Reviewer Comments:</span> <span class="whitespace-pre-line">{{ $target->reviewer_comments }}</span></div>
                     @endif
                 </div>
             @empty

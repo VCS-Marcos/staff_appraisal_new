@@ -172,6 +172,8 @@ class AppraisalController extends Controller
             'next_review_date' => $data['next_review_date'] ?? $appraisal->next_review_date,
         ]);
 
+        $this->saveReviewerTargetComments($appraisal, $data['targets'] ?? []);
+
         $appraisal->targets()->where('target_type', TargetType::NextYear)->delete();
 
         $number = 1;
@@ -204,6 +206,30 @@ class AppraisalController extends Controller
         }
 
         return redirect()->route('appraisals.review', $appraisal)->with('status', 'Progress saved.');
+    }
+
+    /**
+     * Save the reviewer's optional comment on each Section 1 target. Like the staff's own target
+     * comments, these are not audit-logged individually — the audit trail records the review being
+     * submitted. Only this appraisal's current-year targets can be touched, whatever ids the form posts.
+     *
+     * @param  array<int, array<string, mixed>>  $inputs
+     */
+    private function saveReviewerTargetComments(Appraisal $appraisal, array $inputs): void
+    {
+        $targets = $appraisal->targets()->where('target_type', TargetType::Current)->get()->keyBy('id');
+
+        foreach ($inputs as $input) {
+            $target = $targets->get((int) ($input['id'] ?? 0));
+
+            if ($target === null) {
+                continue;
+            }
+
+            $comment = trim((string) ($input['reviewer_comments'] ?? ''));
+
+            $target->update(['reviewer_comments' => $comment === '' ? null : $comment]);
+        }
     }
 
     public function signOff(Appraisal $appraisal): View

@@ -24,6 +24,11 @@ class UpdateAppraisalReviewerRequest extends FormRequest
             'overall_rating' => [$submitting ? 'required' : 'nullable', new Enum(OverallRating::class)],
             'next_review_date' => ['nullable', 'date'],
 
+            // Optional reviewer comment on each of the employee's Section 1 targets.
+            'targets' => ['array'],
+            'targets.*.id' => ['required', 'integer'],
+            'targets.*.reviewer_comments' => ['nullable', 'string', 'max:10000'],
+
             'next_year_targets' => ['array'],
             'next_year_targets.*.target_text' => ['nullable', 'string'],
             'next_year_targets.*.action_text' => ['nullable', 'string'],

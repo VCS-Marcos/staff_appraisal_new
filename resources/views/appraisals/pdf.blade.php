@@ -98,7 +98,11 @@
                     @endif
                     <p><span class="muted">Target Met:</span> {{ $target->target_met ? ucfirst($target->target_met->value) : 'Not yet answered' }}</p>
                     @if ($target->comments)
-                        <p><span class="muted">Comments:</span> {{ $target->comments }}</p>
+                        <p><span class="muted">Staff Comments:</span> {{ $target->comments }}</p>
+                    @endif
+
+                    @if ($target->reviewer_comments)
+                        <p><span class="muted">Reviewer Comments:</span> {{ $target->reviewer_comments }}</p>
                     @endif
                 </div>
             @empty

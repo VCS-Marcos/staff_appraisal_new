@@ -106,7 +106,7 @@
                                     <x-input-error :messages="$errors->get(\"targets.$i.target_met\")" class="mt-2" />
 
                                     <div class="mt-3">
-                                        <x-input-label :for="'comments_'.$i" value="Comments" />
+                                        <x-input-label :for="'comments_'.$i" value="Staff Comments" />
                                         <textarea id="comments_{{ $i }}" name="targets[{{ $i }}][comments]" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old("targets.$i.comments", $target->comments) }}</textarea>
                                     </div>
                                 </div>

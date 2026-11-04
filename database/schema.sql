@@ -83,6 +83,7 @@ CREATE TABLE `appraisal_targets` (
   `target_text` text DEFAULT NULL,
   `target_met` enum('yes','no','partially') DEFAULT NULL,
   `comments` text DEFAULT NULL,
+  `reviewer_comments` text DEFAULT NULL,
   `action_text` text DEFAULT NULL,
   `success_criteria` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
