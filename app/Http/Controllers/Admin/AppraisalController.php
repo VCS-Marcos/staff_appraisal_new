@@ -14,11 +14,13 @@ use App\Models\User;
 use App\Notifications\AppraisalOpened;
 use App\Notifications\AppraisalSubmittedForReview;
 use App\Support\SafeNotify;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AppraisalController extends Controller
@@ -113,7 +115,9 @@ class AppraisalController extends Controller
                 'user_id' => $data['user_id'],
                 'reviewer_id' => $data['reviewer_id'],
                 'year' => $data['year'],
-                'appraisal_date' => $data['appraisal_date'] ?? null,
+                'appraisal_date' => $data['appraisal_date'],
+                'appraisal_time' => $data['appraisal_time'] ?? null,
+                'venue' => $data['venue'] ?? null,
                 'status' => $openNow ? AppraisalStatus::PendingEmployee : AppraisalStatus::Draft,
             ]);
 
@@ -157,12 +161,15 @@ class AppraisalController extends Controller
     public function update(UpdateAppraisalRequest $request, Appraisal $appraisal): RedirectResponse
     {
         $data = $request->validated();
+        $scheduleChanges = $this->scheduleChanges($appraisal, $data);
 
         DB::transaction(function () use ($appraisal, $data) {
             $appraisal->update([
                 'user_id' => $data['user_id'],
                 'reviewer_id' => $data['reviewer_id'],
-                'appraisal_date' => $data['appraisal_date'] ?? null,
+                'appraisal_date' => $data['appraisal_date'],
+                'appraisal_time' => $data['appraisal_time'] ?? null,
+                'venue' => $data['venue'] ?? null,
             ]);
 
             $this->syncCurrentTargets($appraisal, $data['targets'] ?? [], preserveResponses: true);
@@ -170,12 +177,40 @@ class AppraisalController extends Controller
 
         $appraisal->load('employee');
 
-        AuditLog::record('appraisal.updated', $appraisal, sprintf(
-            'Edited appraisal for %s (%s)%s',
+        AuditLog::record('appraisal.updated', $appraisal, Str::limit(sprintf(
+            'Edited appraisal for %s (%s)%s%s',
             $appraisal->employee->name, $appraisal->year, $this->creatorNote($request),
-        ));
+            $scheduleChanges ? ' — '.implode('; ', $scheduleChanges) : '',
+        ), 490));
 
         return redirect()->route($this->indexRoute($request))->with('status', 'Appraisal updated.');
+    }
+
+    /**
+     * Human-readable list of changes to the appraisal's date / time / venue, for the audit log.
+     *
+     * @param  array<string, mixed>  $data  validated request data
+     * @return list<string>
+     */
+    private function scheduleChanges(Appraisal $appraisal, array $data): array
+    {
+        $show = fn (?string $value) => $value === null || $value === '' ? 'not set' : Str::limit($value, 60);
+
+        $pairs = [
+            'appraisal date' => [$appraisal->appraisal_date?->format('d M Y'), Carbon::parse($data['appraisal_date'])->format('d M Y')],
+            'appraisal time' => [$appraisal->timeLabel(), $data['appraisal_time'] ?? null],
+            'venue' => [$appraisal->venue, $data['venue'] ?? null],
+        ];
+
+        $changes = [];
+
+        foreach ($pairs as $label => [$old, $new]) {
+            if (($old ?? '') !== ($new ?? '')) {
+                $changes[] = "{$label} changed from {$show($old)} to {$show($new)}";
+            }
+        }
+
+        return $changes;
     }
 
     public function destroy(Appraisal $appraisal): RedirectResponse

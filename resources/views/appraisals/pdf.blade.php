@@ -75,9 +75,14 @@
                     <td><span class="label">Position</span>{{ $appraisal->employee->position ?? '—' }}</td>
                 </tr>
                 <tr>
-                    <td><span class="label">Appraisal Date</span>{{ optional($appraisal->appraisal_date)->format('d M Y') ?? '—' }}</td>
+                    <td><span class="label">Appraisal Date</span>{{ optional($appraisal->appraisal_date)->format('d M Y') ?? '—' }}@if ($appraisal->timeLabel()), {{ $appraisal->timeLabel() }}@endif</td>
                     <td><span class="label">Reviewer(s)</span>{{ $appraisal->reviewer->name }}</td>
                 </tr>
+                @if ($appraisal->venue)
+                    <tr>
+                        <td colspan="2"><span class="label">Venue / Location</span>{{ $appraisal->venue }}</td>
+                    </tr>
+                @endif
             </table>
             </td>
             </tr>

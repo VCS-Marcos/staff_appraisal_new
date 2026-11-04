@@ -166,7 +166,6 @@ class AppraisalController extends Controller
         $data = $request->validated();
 
         $appraisal->update([
-            'appraisal_date' => $data['appraisal_date'] ?? $appraisal->appraisal_date,
             'reviewer_comments' => $data['reviewer_comments'] ?? $appraisal->reviewer_comments,
             'overall_rating' => $data['overall_rating'] ?? $appraisal->overall_rating,
             'next_review_date' => $data['next_review_date'] ?? $appraisal->next_review_date,

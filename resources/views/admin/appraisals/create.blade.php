@@ -57,9 +57,21 @@
                     @endif
 
                     <div>
-                        <x-input-label for="appraisal_date" value="Appraisal Date (optional)" />
-                        <x-text-input id="appraisal_date" name="appraisal_date" type="date" class="block mt-1 w-full" :value="old('appraisal_date')" />
+                        <x-input-label for="appraisal_date" value="Appraisal Date" />
+                        <x-text-input id="appraisal_date" name="appraisal_date" type="date" class="block mt-1 w-full" :value="old('appraisal_date')" required />
                         <x-input-error :messages="$errors->get('appraisal_date')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="appraisal_time" value="Appraisal Time (optional)" />
+                        <x-text-input id="appraisal_time" name="appraisal_time" type="time" class="block mt-1 w-full" :value="old('appraisal_time')" />
+                        <x-input-error :messages="$errors->get('appraisal_time')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="venue" value="Venue / Location (optional)" />
+                        <x-text-input id="venue" name="venue" type="text" maxlength="255" class="block mt-1 w-full" :value="old('venue')" placeholder="e.g. Principal's office" />
+                        <x-input-error :messages="$errors->get('venue')" class="mt-2" />
                     </div>
 
                     <div>

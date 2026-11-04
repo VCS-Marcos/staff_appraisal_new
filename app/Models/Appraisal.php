@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'user_id', 'reviewer_id', 'year', 'appraisal_date',
+    'user_id', 'reviewer_id', 'year', 'appraisal_date', 'appraisal_time', 'venue',
     'self_reflection', 'reviewer_comments', 'overall_rating',
     'next_review_date', 'status', 'completion_mode', 'employee_signed_at', 'reviewer_signed_at',
 ])]
@@ -68,6 +68,12 @@ class Appraisal extends Model
     public function professionalDevelopment(): HasMany
     {
         return $this->hasMany(ProfessionalDevelopment::class)->orderBy('activity_date');
+    }
+
+    /** The appraisal time as HH:MM (the column stores HH:MM:SS), or null when not set. */
+    public function timeLabel(): ?string
+    {
+        return $this->appraisal_time ? substr($this->appraisal_time, 0, 5) : null;
     }
 
     public function isCompleted(): bool

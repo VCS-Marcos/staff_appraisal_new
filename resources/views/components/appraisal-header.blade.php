@@ -46,7 +46,10 @@
             <div class="text-xs text-gray-400 mt-0.5">
                 Reviewer: {{ $appraisal->reviewer->name }}
                 @if ($appraisal->appraisal_date)
-                    &middot; Appraisal Date: {{ $appraisal->appraisal_date->format('d M Y') }}
+                    &middot; Appraisal Date: {{ $appraisal->appraisal_date->format('d M Y') }}@if ($appraisal->timeLabel()), {{ $appraisal->timeLabel() }}@endif
+                @endif
+                @if ($appraisal->venue)
+                    &middot; Venue: {{ $appraisal->venue }}
                 @endif
             </div>
         </div>

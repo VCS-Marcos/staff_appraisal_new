@@ -19,7 +19,6 @@ class UpdateAppraisalReviewerRequest extends FormRequest
         $submitting = $this->input('intent') === 'submit';
 
         return [
-            'appraisal_date' => ['nullable', 'date'],
             'reviewer_comments' => [$submitting ? 'required' : 'nullable', 'string'],
             'overall_rating' => [$submitting ? 'required' : 'nullable', new Enum(OverallRating::class)],
             'next_review_date' => ['nullable', 'date'],

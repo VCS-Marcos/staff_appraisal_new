@@ -54,6 +54,8 @@ CREATE TABLE `appraisals` (
   `reviewer_id` bigint(20) unsigned NOT NULL,
   `year` smallint(5) unsigned NOT NULL,
   `appraisal_date` date DEFAULT NULL,
+  `appraisal_time` time DEFAULT NULL,
+  `venue` varchar(255) DEFAULT NULL,
   `self_reflection` text DEFAULT NULL,
   `reviewer_comments` text DEFAULT NULL,
   `overall_rating` enum('Did Not Meet All Targets','Met All Targets','Exceeded All Targets') DEFAULT NULL,

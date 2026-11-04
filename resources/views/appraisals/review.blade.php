@@ -19,7 +19,7 @@
 
                 $errorKeys = collect($errors->keys());
                 $errorTab = 'targets';
-                if ($errorKeys->contains(fn ($k) => in_array($k, ['reviewer_comments', 'overall_rating', 'appraisal_date', 'next_review_date'], true))) {
+                if ($errorKeys->contains(fn ($k) => in_array($k, ['reviewer_comments', 'overall_rating', 'next_review_date'], true))) {
                     $errorTab = 'performance';
                 }
                 if ($errorKeys->contains(fn ($k) => str_starts_with($k, 'next_year_targets'))) {
@@ -100,12 +100,21 @@
                             <p class="text-sm text-gray-800 whitespace-pre-line">{{ $appraisal->self_reflection ?: '—' }}</p>
                         </div>
 
-                        <div class="mb-4">
-                            <x-input-label for="appraisal_date" value="Appraisal Date" />
-                            <x-text-input id="appraisal_date" name="appraisal_date" type="date" class="block mt-1 w-full sm:w-64" :value="old('appraisal_date', optional($appraisal->appraisal_date)->format('Y-m-d'))" />
-                            <p class="text-xs text-gray-500 mt-1">The date this appraisal meeting took place.</p>
-                            <x-input-error :messages="$errors->get('appraisal_date')" class="mt-2" />
-                        </div>
+                        {{-- Set when the appraisal is created (or edited by an admin); read-only for the reviewer. --}}
+                        <dl class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <dt class="text-gray-500">Appraisal Date</dt>
+                                <dd class="font-medium text-gray-900">{{ optional($appraisal->appraisal_date)->format('d M Y') ?? '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-gray-500">Time</dt>
+                                <dd class="font-medium text-gray-900">{{ $appraisal->timeLabel() ?? '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-gray-500">Venue / Location</dt>
+                                <dd class="font-medium text-gray-900">{{ $appraisal->venue ?: '—' }}</dd>
+                            </div>
+                        </dl>
 
                         <x-input-label for="reviewer_comments" value="Reviewer's Comments and Actions" />
                         <textarea id="reviewer_comments" name="reviewer_comments" rows="8" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('reviewer_comments', $appraisal->reviewer_comments) }}</textarea>
