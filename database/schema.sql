@@ -76,7 +76,7 @@ CREATE TABLE `appraisals` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Serves both Section 1 (target_type='current', reviewed by employee) and
--- Section 3 (target_type='next_year', set by reviewer, with action_text/success_criteria)
+-- Section 3 (target_type='next_year', set by reviewer). Each target has a list of action/success-criteria pairs in `actions` (JSON); the legacy action_text/success_criteria columns are no longer used.
 CREATE TABLE `appraisal_targets` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `appraisal_id` bigint(20) unsigned NOT NULL,
@@ -88,6 +88,7 @@ CREATE TABLE `appraisal_targets` (
   `reviewer_comments` text DEFAULT NULL,
   `action_text` text DEFAULT NULL,
   `success_criteria` text DEFAULT NULL,
+  `actions` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),

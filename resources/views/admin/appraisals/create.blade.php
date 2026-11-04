@@ -4,7 +4,7 @@
     </x-slot>
 
     @php
-        $defaultTargets = old('targets', [['target_text' => '', 'action_text' => '', 'success_criteria' => '']]);
+        $defaultTargets = old('targets', [['target_text' => '', 'actions' => [['action_text' => '', 'success_criteria' => '']]]]);
     @endphp
 
     <div class="py-12">
@@ -79,19 +79,30 @@
                         <p class="text-xs text-gray-500 mb-3">Carried forward from last year's new targets, if any. Add or remove target cards as needed.</p>
 
                         <div class="space-y-3">
-                            <template x-for="(target, index) in targets" :key="index">
+                            <template x-for="(target, index) in targets" :key="target._k">
                                 <div class="border border-gray-200 rounded-md p-3">
                                     <div class="flex items-center justify-between mb-1">
                                         <label class="block text-sm font-medium text-gray-700" x-text="'Target ' + (index + 1)"></label>
-                                        <button type="button" x-show="targets.length > 1" x-on:click="removeTarget(index)" class="text-xs text-red-600 hover:underline">Remove</button>
+                                        <button type="button" :style="targets.length > 1 ? '' : 'display:none'" x-on:click="removeTarget(index)" class="text-xs text-red-600 hover:underline">Remove</button>
                                     </div>
                                     <textarea :name="'targets[' + index + '][target_text]'" x-model="target.target_text" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Target"></textarea>
 
-                                    <label class="block text-sm font-medium text-gray-700 mt-3">Action to be Completed</label>
-                                    <textarea :name="'targets[' + index + '][action_text]'" x-model="target.action_text" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                    <template x-for="(pair, j) in targets[index].actions" :key="pair._k">
+                                        <div class="mt-3 pl-3 border-l-2 border-indigo-100">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-xs font-semibold text-gray-500 uppercase" x-text="'Action ' + (j + 1)"></span>
+                                                <button type="button" :style="targets[index].actions.length > 1 ? '' : 'display:none'" x-on:click="removeAction(index, j)" class="text-xs text-red-600 hover:underline">Remove</button>
+                                            </div>
 
-                                    <label class="block text-sm font-medium text-gray-700 mt-3">Success Criteria</label>
-                                    <textarea :name="'targets[' + index + '][success_criteria]'" x-model="target.success_criteria" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                            <label class="block text-sm font-medium text-gray-700 mt-1">Action to be Completed</label>
+                                            <textarea :name="'targets[' + index + '][actions][' + j + '][action_text]'" x-model="pair.action_text" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+
+                                            <label class="block text-sm font-medium text-gray-700 mt-3">Success Criteria</label>
+                                            <textarea :name="'targets[' + index + '][actions][' + j + '][success_criteria]'" x-model="pair.success_criteria" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                        </div>
+                                    </template>
+
+                                    <button type="button" x-on:click="addAction(index)" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add another action &amp; success criteria</button>
                                 </div>
                             </template>
                         </div>
@@ -121,11 +132,35 @@
             return {
                 reviewerId: '{{ old('reviewer_id') }}',
                 targets: @json($defaultTargets),
+                uid: 0,
+                init() {
+                    this.normalizeTargets();
+                },
+                // Unique keys (_k) let the page remove exactly the block that was clicked; they are never submitted.
+                key() {
+                    return ++this.uid;
+                },
+                // Every target needs at least one action / success-criteria pair to type into.
+                normalizeTargets() {
+                    this.targets.forEach(t => {
+                        if (!Array.isArray(t.actions) || t.actions.length === 0) {
+                            t.actions = [{ action_text: t.action_text || '', success_criteria: t.success_criteria || '' }];
+                        }
+                        t._k = t._k || this.key();
+                        t.actions.forEach(p => { p._k = p._k || this.key(); });
+                    });
+                },
                 addTarget() {
-                    this.targets.push({ target_text: '', action_text: '', success_criteria: '' });
+                    this.targets.push({ _k: this.key(), target_text: '', actions: [{ _k: this.key(), action_text: '', success_criteria: '' }] });
                 },
                 removeTarget(index) {
                     this.targets.splice(index, 1);
+                },
+                addAction(index) {
+                    this.targets[index].actions.push({ _k: this.key(), action_text: '', success_criteria: '' });
+                },
+                removeAction(index, pairIndex) {
+                    this.targets[index].actions.splice(pairIndex, 1);
                 },
                 onEmployeeChange(userId) {
                     const option = document.querySelector(`#user_id option[value="${userId}"]`);
@@ -140,9 +175,11 @@
                         .then(data => {
                             const targets = data.targets || [];
                             const isUntouched = this.targets.length === 1
-                                && !this.targets[0].target_text && !this.targets[0].action_text && !this.targets[0].success_criteria;
+                                && !this.targets[0].target_text
+                                && this.targets[0].actions.every(p => !p.action_text && !p.success_criteria);
                             if (targets.length && isUntouched) {
                                 this.targets = targets;
+                                this.normalizeTargets();
                             }
                         });
                 },

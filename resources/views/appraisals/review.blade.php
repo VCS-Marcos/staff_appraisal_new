@@ -11,10 +11,9 @@
                     $appraisal->nextYearTargets->isNotEmpty()
                         ? $appraisal->nextYearTargets->map(fn ($t) => [
                             'target_text' => $t->target_text,
-                            'action_text' => $t->action_text,
-                            'success_criteria' => $t->success_criteria,
+                            'actions' => $t->actionPairs(),
                         ])->values()->all()
-                        : [['target_text' => '', 'action_text' => '', 'success_criteria' => '']]
+                        : [['target_text' => '', 'actions' => [['action_text' => '', 'success_criteria' => '']]]]
                 );
 
                 $errorKeys = collect($errors->keys());
@@ -40,7 +39,7 @@
                 </div>
             @endif
 
-            <form id="review-form" method="POST" action="{{ route('appraisals.review.update', $appraisal) }}" class="space-y-6" x-data='{ tab: "{{ $errorTab }}", nextYearTargets: @json($initialNextYearTargets) }'>
+            <form id="review-form" method="POST" action="{{ route('appraisals.review.update', $appraisal) }}" class="space-y-6" x-data="appraisalReviewForm({{ Js::from(['tab' => $errorTab, 'nextYearTargets' => $initialNextYearTargets]) }})">
                 @csrf
                 @method('PUT')
 
@@ -70,14 +69,7 @@
                                     <input type="hidden" name="targets[{{ $i }}][id]" value="{{ $target->id }}">
                                     <div class="text-sm font-semibold text-gray-700">Target {{ $target->target_number }}:</div>
                                     <p class="text-sm text-gray-800 mt-1 whitespace-pre-line">{{ $target->target_text ?: '—' }}</p>
-                                    @if ($target->action_text || $target->success_criteria)
-                                        <div class="mt-2 pl-4 border-l-2 border-gray-100 text-sm">
-                                            <div class="font-medium text-gray-700">Action to be Completed</div>
-                                            <div class="text-gray-800">{{ $target->action_text ?: '—' }}</div>
-                                            <div class="font-medium text-gray-700 mt-1">Success Criteria</div>
-                                            <div class="text-gray-500">{{ $target->success_criteria ?: '—' }}</div>
-                                        </div>
-                                    @endif
+                                    @include('appraisals._target-actions', ['target' => $target])
                                     <div class="mt-2 text-sm"><span class="text-gray-500">Target Met:</span> <span class="font-medium">{{ $target->target_met ? ucfirst($target->target_met->value) : '—' }}</span></div>
                                     @if ($target->comments)
                                         <div class="mt-1 text-sm"><span class="text-gray-500">Staff Comments:</span> {{ $target->comments }}</div>
@@ -86,7 +78,7 @@
                                     <div class="mt-4 pt-3 border-t border-gray-100">
                                         <x-input-label :for="'reviewer_comments_'.$i" value="Reviewer Comments (optional)" />
                                         <textarea id="reviewer_comments_{{ $i }}" name="targets[{{ $i }}][reviewer_comments]" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old("targets.$i.reviewer_comments", $target->reviewer_comments) }}</textarea>
-                                        <x-input-error :messages="$errors->get(\"targets.$i.reviewer_comments\")" class="mt-2" />
+                                        <x-input-error :messages="$errors->get('targets.'.$i.'.reviewer_comments')" class="mt-2" />
                                     </div>
                                 </div>
                             @endforeach
@@ -147,24 +139,35 @@
                         <x-input-error :messages="$errors->get('next_year_targets')" class="mb-3" />
 
                         <div class="space-y-4">
-                            <template x-for="(t, index) in nextYearTargets" :key="index">
+                            <template x-for="(t, index) in nextYearTargets" :key="t._k">
                                 <div class="border border-gray-200 rounded-md p-4">
                                     <div class="flex items-center justify-between mb-1">
                                         <label class="block text-sm font-medium text-gray-700" x-text="'Target ' + (index + 1)"></label>
-                                        <button type="button" x-show="nextYearTargets.length > 1" x-on:click="nextYearTargets.splice(index, 1)" class="text-xs text-red-600 hover:underline">Remove</button>
+                                        <button type="button" :style="nextYearTargets.length > 1 ? '' : 'display:none'" x-on:click="nextYearTargets.splice(index, 1)" class="text-xs text-red-600 hover:underline">Remove</button>
                                     </div>
                                     <textarea :name="'next_year_targets[' + index + '][target_text]'" x-model="t.target_text" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Target"></textarea>
 
-                                    <label class="block text-sm font-medium text-gray-700 mt-3">Action to be Completed</label>
-                                    <textarea :name="'next_year_targets[' + index + '][action_text]'" x-model="t.action_text" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                    <template x-for="(pair, j) in nextYearTargets[index].actions" :key="pair._k">
+                                        <div class="mt-3 pl-3 border-l-2 border-indigo-100">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-xs font-semibold text-gray-500 uppercase" x-text="'Action ' + (j + 1)"></span>
+                                                <button type="button" :style="nextYearTargets[index].actions.length > 1 ? '' : 'display:none'" x-on:click="removeAction(index, j)" class="text-xs text-red-600 hover:underline">Remove</button>
+                                            </div>
 
-                                    <label class="block text-sm font-medium text-gray-700 mt-3">Success Criteria</label>
-                                    <textarea :name="'next_year_targets[' + index + '][success_criteria]'" x-model="t.success_criteria" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                            <label class="block text-sm font-medium text-gray-700 mt-1">Action to be Completed</label>
+                                            <textarea :name="'next_year_targets[' + index + '][actions][' + j + '][action_text]'" x-model="pair.action_text" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+
+                                            <label class="block text-sm font-medium text-gray-700 mt-3">Success Criteria</label>
+                                            <textarea :name="'next_year_targets[' + index + '][actions][' + j + '][success_criteria]'" x-model="pair.success_criteria" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                        </div>
+                                    </template>
+
+                                    <button type="button" x-on:click="addAction(index)" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add another action &amp; success criteria</button>
                                 </div>
                             </template>
                         </div>
 
-                        <button type="button" x-on:click="nextYearTargets.push({ target_text: '', action_text: '', success_criteria: '' })" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add Target</button>
+                        <button type="button" x-on:click="addTarget()" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add Target</button>
                     </div>
 
                     <div x-show="tab === 'cpd'" x-cloak>
@@ -209,4 +212,37 @@
             </form>
         </div>
     </div>
+
+    <script>
+        function appraisalReviewForm(initial) {
+            return {
+                tab: initial.tab,
+                nextYearTargets: initial.nextYearTargets,
+                uid: 0,
+                // Unique keys (_k) let the page remove exactly the block that was clicked; they are never submitted.
+                key() {
+                    return ++this.uid;
+                },
+                init() {
+                    // Every target needs at least one action / success-criteria pair to type into.
+                    this.nextYearTargets.forEach(t => {
+                        if (!Array.isArray(t.actions) || t.actions.length === 0) {
+                            t.actions = [{ action_text: t.action_text || '', success_criteria: t.success_criteria || '' }];
+                        }
+                        t._k = t._k || this.key();
+                        t.actions.forEach(p => { p._k = p._k || this.key(); });
+                    });
+                },
+                addTarget() {
+                    this.nextYearTargets.push({ _k: this.key(), target_text: '', actions: [{ _k: this.key(), action_text: '', success_criteria: '' }] });
+                },
+                addAction(index) {
+                    this.nextYearTargets[index].actions.push({ _k: this.key(), action_text: '', success_criteria: '' });
+                },
+                removeAction(index, pairIndex) {
+                    this.nextYearTargets[index].actions.splice(pairIndex, 1);
+                },
+            };
+        }
+    </script>
 </x-app-layout>

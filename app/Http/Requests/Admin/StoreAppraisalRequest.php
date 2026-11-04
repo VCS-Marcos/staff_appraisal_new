@@ -41,6 +41,10 @@ class StoreAppraisalRequest extends FormRequest
             'intent' => ['nullable', 'string', 'in:draft,open'],
             'targets' => ['array'],
             'targets.*.target_text' => ['nullable', 'string'],
+            'targets.*.actions' => ['nullable', 'array'],
+            'targets.*.actions.*.action_text' => ['nullable', 'string'],
+            'targets.*.actions.*.success_criteria' => ['nullable', 'string'],
+            // Legacy single-pair fields: still accepted so a form opened before the multi-action update can be saved.
             'targets.*.action_text' => ['nullable', 'string'],
             'targets.*.success_criteria' => ['nullable', 'string'],
         ];

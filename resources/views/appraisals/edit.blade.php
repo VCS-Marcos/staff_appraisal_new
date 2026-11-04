@@ -83,14 +83,7 @@
                                     <input type="hidden" name="targets[{{ $i }}][id]" value="{{ $target->id }}">
                                     <div class="text-sm font-semibold text-gray-700 mb-2">Target {{ $target->target_number }}:</div>
                                     <p class="text-sm text-gray-800 mb-3 whitespace-pre-line">{{ $target->target_text ?: '(No target text recorded)' }}</p>
-                                    @if ($target->action_text || $target->success_criteria)
-                                        <div class="mb-3 pl-4 border-l-2 border-gray-100 text-sm">
-                                            <div class="font-medium text-gray-700">Action to be Completed</div>
-                                            <div class="text-gray-800">{{ $target->action_text ?: '—' }}</div>
-                                            <div class="font-medium text-gray-700 mt-1">Success Criteria</div>
-                                            <div class="text-gray-500">{{ $target->success_criteria ?: '—' }}</div>
-                                        </div>
-                                    @endif
+                                    <div class="mb-3">@include('appraisals._target-actions', ['target' => $target])</div>
 
                                     <x-input-label value="Target Met" />
                                     <div class="flex gap-4 mt-1">
@@ -103,7 +96,7 @@
                                             </label>
                                         @endforeach
                                     </div>
-                                    <x-input-error :messages="$errors->get(\"targets.$i.target_met\")" class="mt-2" />
+                                    <x-input-error :messages="$errors->get('targets.'.$i.'.target_met')" class="mt-2" />
 
                                     <div class="mt-3">
                                         <x-input-label :for="'comments_'.$i" value="Staff Comments" />

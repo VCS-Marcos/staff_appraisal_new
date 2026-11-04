@@ -97,10 +97,7 @@
                 <div class="card">
                     <div class="title">Target {{ $target->target_number }}:</div>
                     <p>{{ $target->target_text ?: '—' }}</p>
-                    @if ($target->action_text || $target->success_criteria)
-                        <p><span class="muted">Action to be Completed:</span> {{ $target->action_text ?: '—' }}</p>
-                        <p><span class="muted">Success Criteria:</span> {{ $target->success_criteria ?: '—' }}</p>
-                    @endif
+                    @include('appraisals._target-actions-pdf', ['target' => $target])
                     <p><span class="muted">Target Met:</span> {{ $target->target_met ? ucfirst($target->target_met->value) : 'Not yet answered' }}</p>
                     @if ($target->comments)
                         <p><span class="muted">Staff Comments:</span> {{ $target->comments }}</p>
@@ -144,10 +141,7 @@
                     <div class="card">
                         <div class="title">Target {{ $target->target_number }}:</div>
                         <p>{{ $target->target_text ?: '—' }}</p>
-                        @if ($target->action_text || $target->success_criteria)
-                            <p><span class="muted">Action to be Completed:</span> {{ $target->action_text ?: '—' }}</p>
-                            <p><span class="muted">Success Criteria:</span> {{ $target->success_criteria ?: '—' }}</p>
-                        @endif
+                        @include('appraisals._target-actions-pdf', ['target' => $target])
                     </div>
                 @endforeach
             </div>

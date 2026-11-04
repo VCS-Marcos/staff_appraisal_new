@@ -30,6 +30,10 @@ class UpdateAppraisalReviewerRequest extends FormRequest
 
             'next_year_targets' => ['array'],
             'next_year_targets.*.target_text' => ['nullable', 'string'],
+            'next_year_targets.*.actions' => ['nullable', 'array'],
+            'next_year_targets.*.actions.*.action_text' => ['nullable', 'string'],
+            'next_year_targets.*.actions.*.success_criteria' => ['nullable', 'string'],
+            // Legacy single-pair fields: still accepted so a form opened before the multi-action update can be saved.
             'next_year_targets.*.action_text' => ['nullable', 'string'],
             'next_year_targets.*.success_criteria' => ['nullable', 'string'],
         ];

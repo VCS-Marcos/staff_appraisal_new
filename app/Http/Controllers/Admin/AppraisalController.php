@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\ReopenAppraisalRequest;
 use App\Http\Requests\Admin\StoreAppraisalRequest;
 use App\Http\Requests\Admin\UpdateAppraisalRequest;
 use App\Models\Appraisal;
+use App\Models\AppraisalTarget;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Notifications\AppraisalOpened;
@@ -336,11 +337,9 @@ class AppraisalController extends Controller
 
         $number = 1;
         foreach ($targets as $input) {
-            $isBlank = blank($input['target_text'] ?? null)
-                && blank($input['action_text'] ?? null)
-                && blank($input['success_criteria'] ?? null);
+            $pairs = AppraisalTarget::cleanPairs($input);
 
-            if ($isBlank) {
+            if (blank($input['target_text'] ?? null) && $pairs === []) {
                 continue;
             }
 
@@ -350,8 +349,7 @@ class AppraisalController extends Controller
                 'target_type' => TargetType::Current,
                 'target_number' => $number++,
                 'target_text' => $input['target_text'] ?? null,
-                'action_text' => $input['action_text'] ?? null,
-                'success_criteria' => $input['success_criteria'] ?? null,
+                'actions' => $pairs,
                 'target_met' => $previous?->target_met,
                 'comments' => $previous?->comments,
                 'reviewer_comments' => $previous?->reviewer_comments,
@@ -376,8 +374,7 @@ class AppraisalController extends Controller
         return response()->json([
             'targets' => $prior?->targets->map(fn ($t) => [
                 'target_text' => $t->target_text,
-                'action_text' => $t->action_text,
-                'success_criteria' => $t->success_criteria,
+                'actions' => $t->actionPairs(),
             ])->values() ?? [],
         ]);
     }

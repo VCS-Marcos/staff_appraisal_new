@@ -177,11 +177,9 @@ class AppraisalController extends Controller
 
         $number = 1;
         foreach (($data['next_year_targets'] ?? []) as $targetInput) {
-            $isBlank = blank($targetInput['target_text'] ?? null)
-                && blank($targetInput['action_text'] ?? null)
-                && blank($targetInput['success_criteria'] ?? null);
+            $pairs = AppraisalTarget::cleanPairs($targetInput);
 
-            if ($isBlank) {
+            if (blank($targetInput['target_text'] ?? null) && $pairs === []) {
                 continue;
             }
 
@@ -189,8 +187,7 @@ class AppraisalController extends Controller
                 'target_type' => TargetType::NextYear,
                 'target_number' => $number++,
                 'target_text' => $targetInput['target_text'] ?? null,
-                'action_text' => $targetInput['action_text'] ?? null,
-                'success_criteria' => $targetInput['success_criteria'] ?? null,
+                'actions' => $pairs,
             ]);
         }
 

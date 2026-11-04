@@ -13,14 +13,7 @@
                 <div class="border border-gray-200 rounded-md p-4">
                     <div class="text-sm font-semibold text-gray-700">Target {{ $target->target_number }}:</div>
                     <p class="text-sm text-gray-800 mt-1 whitespace-pre-line">{{ $target->target_text ?: '—' }}</p>
-                    @if ($target->action_text || $target->success_criteria)
-                        <div class="mt-2 pl-4 border-l-2 border-gray-100 text-sm">
-                            <div class="font-medium text-gray-700">Action to be Completed</div>
-                            <div class="text-gray-800">{{ $target->action_text ?: '—' }}</div>
-                            <div class="font-medium text-gray-700 mt-1">Success Criteria</div>
-                            <div class="text-gray-500">{{ $target->success_criteria ?: '—' }}</div>
-                        </div>
-                    @endif
+                    @include('appraisals._target-actions', ['target' => $target])
                     <div class="mt-2 text-sm">
                         <span class="text-gray-500">Target Met:</span>
                         <span class="font-medium">{{ $target->target_met ? ucfirst($target->target_met->value) : 'Not yet answered' }}</span>
@@ -67,14 +60,7 @@
                 <div class="border border-gray-200 rounded-md p-4">
                     <div class="text-sm font-semibold text-gray-700">Target {{ $target->target_number }}:</div>
                     <p class="text-sm text-gray-800 mt-1 whitespace-pre-line">{{ $target->target_text ?: '—' }}</p>
-                    @if ($target->action_text || $target->success_criteria)
-                        <div class="mt-2 pl-4 border-l-2 border-gray-100 text-sm">
-                            <div class="font-medium text-gray-700">Action to be Completed</div>
-                            <div class="text-gray-800">{{ $target->action_text ?: '—' }}</div>
-                            <div class="font-medium text-gray-700 mt-1">Success Criteria</div>
-                            <div class="text-gray-500">{{ $target->success_criteria ?: '—' }}</div>
-                        </div>
-                    @endif
+                    @include('appraisals._target-actions', ['target' => $target])
                 </div>
             @empty
                 <p class="text-sm text-gray-500">No new targets recorded yet.</p>
