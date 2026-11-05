@@ -19,14 +19,16 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-canvas">
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
+            <!-- Page Heading: a soft brand-blue wash with the logo's yellow as an accent bar -->
             @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+                <header class="bg-gradient-to-r from-indigo-50 via-white to-white border-b border-indigo-100 shadow-sm">
+                    <div class="max-w-7xl mx-auto py-5 px-4 sm:px-6 lg:px-8">
+                        <div class="border-l-4 border-accent-400 pl-4">
+                            {{ $header }}
+                        </div>
                     </div>
                 </header>
             @endisset
@@ -34,7 +36,7 @@
             <!-- Page Content -->
             @if (session('warning_recipients'))
                 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 pt-6">
-                    <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-md" role="alert">
+                    <div class="p-4 bg-accent-50 border-l-4 border-accent-400 text-amber-900 text-sm rounded-xl" role="alert">
                         Your change was saved, but the email notification could not be sent to {{ implode(', ', session('warning_recipients')) }}. Please let them know directly.
                     </div>
                 </div>

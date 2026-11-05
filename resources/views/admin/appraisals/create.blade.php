@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Create an Appraisal') }}</h2>
+        <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('Create an Appraisal') }}</h2>
     </x-slot>
 
     @php
@@ -9,7 +9,7 @@
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                 <form method="POST" action="{{ route('admin.appraisals.store') }}" class="space-y-4" x-data="appraisalCreateForm()">
                     @csrf
 
@@ -75,39 +75,63 @@
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-700 mb-1">Section 1 Targets</h3>
+                        <h3 class="text-sm font-bold text-indigo-900 mb-1">Section 1 Targets</h3>
                         <p class="text-xs text-gray-500 mb-3">Carried forward from last year's new targets, if any. Add or remove target cards as needed.</p>
 
                         <div class="space-y-3">
                             <template x-for="(target, index) in targets" :key="target._k">
-                                <div class="border border-gray-200 rounded-md p-3">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <label class="block text-sm font-medium text-gray-700" x-text="'Target ' + (index + 1)"></label>
-                                        <button type="button" :style="targets.length > 1 ? '' : 'display:none'" x-on:click="removeTarget(index)" class="text-xs text-red-600 hover:underline">Remove</button>
+                                <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                                    <div class="flex items-center justify-between border-b border-indigo-100 bg-indigo-50 px-4 py-2.5">
+                                        <div class="flex items-center gap-2 text-sm font-bold text-indigo-900">
+                                            <span class="grid h-6 w-6 place-items-center rounded-md bg-indigo-900 text-xs text-white" x-text="index + 1"></span>
+                                            <span x-text="'Target ' + (index + 1)"></span>
+                                        </div>
+                                        <button type="button" :style="targets.length > 1 ? '' : 'display:none'" x-on:click="removeTarget(index)" class="text-xs font-medium text-red-600 hover:underline">Remove target</button>
                                     </div>
-                                    <textarea :name="'targets[' + index + '][target_text]'" x-model="target.target_text" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Target"></textarea>
+                                    <div class="space-y-4 p-4">
+                                        <div>
+                                            <label class="label-caps mb-1 block">Target</label>
+                                            <textarea :name="'targets[' + index + '][target_text]'" x-model="target.target_text" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm" placeholder="What is the target?"></textarea>
+                                        </div>
 
-                                    <template x-for="(pair, j) in targets[index].actions" :key="pair._k">
-                                        <div class="mt-3 pl-3 border-l-2 border-indigo-100">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-xs font-semibold text-gray-500 uppercase" x-text="'Action ' + (j + 1)"></span>
-                                                <button type="button" :style="targets[index].actions.length > 1 ? '' : 'display:none'" x-on:click="removeAction(index, j)" class="text-xs text-red-600 hover:underline">Remove</button>
+                                        <div>
+                                            <div class="mb-2 flex items-center justify-between">
+                                                <span class="label-caps">Actions &amp; success criteria</span>
+                                                <span class="text-xs text-gray-500" x-text="targets[index].actions.length + (targets[index].actions.length === 1 ? ' pair' : ' pairs')"></span>
                                             </div>
 
-                                            <label class="block text-sm font-medium text-gray-700 mt-1">Action to be Completed</label>
-                                            <textarea :name="'targets[' + index + '][actions][' + j + '][action_text]'" x-model="pair.action_text" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                            <div class="space-y-2.5">
+                                                <template x-for="(pair, j) in targets[index].actions" :key="pair._k">
+                                                    <div class="rounded-lg border border-l-4 border-gray-200 border-l-indigo-600 bg-slate-50 p-3">
+                                                        <div class="mb-2 flex items-center justify-between">
+                                                            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700">
+                                                                <span class="grid h-5 w-5 place-items-center rounded-full bg-indigo-600 text-[11px] text-white" x-text="j + 1"></span>
+                                                                <span x-text="'Action ' + (j + 1)"></span>
+                                                            </span>
+                                                            <button type="button" :style="targets[index].actions.length > 1 ? '' : 'display:none'" x-on:click="removeAction(index, j)" class="text-xs font-medium text-red-600 hover:underline">Remove</button>
+                                                        </div>
+                                                        <div class="grid gap-3 sm:grid-cols-2">
+                                                            <div>
+                                                                <label class="label-caps mb-1 block">Action to be completed</label>
+                                                                <textarea :name="'targets[' + index + '][actions][' + j + '][action_text]'" x-model="pair.action_text" rows="3" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm"></textarea>
+                                                            </div>
+                                                            <div>
+                                                                <label class="label-caps mb-1 block">Success criteria</label>
+                                                                <textarea :name="'targets[' + index + '][actions][' + j + '][success_criteria]'" x-model="pair.success_criteria" rows="3" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm" placeholder="How will we know it is done?"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
 
-                                            <label class="block text-sm font-medium text-gray-700 mt-3">Success Criteria</label>
-                                            <textarea :name="'targets[' + index + '][actions][' + j + '][success_criteria]'" x-model="pair.success_criteria" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                            <button type="button" x-on:click="addAction(index)" class="mt-2.5 w-full rounded-lg border-2 border-dashed border-indigo-200 py-2.5 text-sm font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50">+ Add another action &amp; success criteria</button>
                                         </div>
-                                    </template>
-
-                                    <button type="button" x-on:click="addAction(index)" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add another action &amp; success criteria</button>
+                                    </div>
                                 </div>
                             </template>
                         </div>
 
-                        <button type="button" x-on:click="addTarget()" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add Target</button>
+                        <button type="button" x-on:click="addTarget()" class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-indigo-700 shadow-sm transition hover:bg-indigo-50">+ Add Target</button>
                     </div>
 
                     <div class="flex flex-wrap justify-end gap-3">

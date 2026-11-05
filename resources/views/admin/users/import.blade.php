@@ -1,12 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Import Staff from CSV') }}</h2>
+        <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('Import Staff from CSV') }}</h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8 space-y-6">
             @if ($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 text-sm">
+                <div class="bg-red-50 border-l-4 border-red-500 text-red-900 rounded-xl p-4 text-sm">
                     <p class="font-semibold mb-1">The file couldn't be imported — please fix the following:</p>
                     <ul class="list-disc list-inside space-y-0.5">
                         @foreach ($errors->all() as $error)
@@ -16,7 +16,7 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                 <h3 class="text-sm font-semibold text-gray-700 mb-2">CSV format</h3>
                 <p class="text-sm text-gray-500 mb-3">
                     The first row must be a header with these column names (any order):
@@ -38,7 +38,7 @@
                 </a>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                 <form method="POST" action="{{ route('admin.users.import.submit') }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
 

@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <a href="{{ route('reports.index') }}" class="text-xs text-gray-500 hover:text-gray-700">&larr; Reports</a>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Activity Log') }}</h2>
+                <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('Activity Log') }}</h2>
             </div>
             <a href="{{ route('reports.audit.export', request()->query()) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                 <x-icon name="download" class="w-3.5 h-3.5" /> Export CSV
@@ -13,7 +13,7 @@
 
     <div class="py-12">
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
                 <div class="p-4 border-b border-gray-100">
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">All User Activity</p>
                     <form method="GET" class="flex flex-wrap gap-3">
@@ -46,12 +46,12 @@
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-indigo-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">When</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide whitespace-nowrap">When</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">User</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Action</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Details</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">

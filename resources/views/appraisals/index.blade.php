@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('My Appraisals') }}</h2>
+            <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('My Appraisals') }}</h2>
             @can('create', \App\Models\Appraisal::class)
                 <a href="{{ route('admin.appraisals.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                     <x-icon name="plus" class="w-3.5 h-3.5" /> Create Appraisal
@@ -18,11 +18,11 @@
     <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
             @if (session('status'))
-                <div class="p-4 bg-green-50 text-green-700 text-sm rounded-md">{{ session('status') }}</div>
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-900 text-sm rounded-xl">{{ session('status') }}</div>
             @endif
 
             @if ($hasTeam)
-                <div id="team-appraisals" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div id="team-appraisals" class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
                     <div class="p-4 border-b border-gray-100">
                         <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">As Reviewer — Your Team</p>
                         <form method="GET" action="{{ route('appraisals.index') }}#team-appraisals" class="flex flex-wrap gap-3">
@@ -58,11 +58,11 @@
                     </div>
 
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-indigo-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Employee</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Year</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Status</th>
                                 <th class="px-6 py-3"></th>
                             </tr>
                         </thead>
@@ -112,7 +112,7 @@
                 </div>
             @endif
 
-            <div id="my-appraisals" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div id="my-appraisals" class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
                 <div class="p-4 border-b border-gray-100">
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide {{ $myYears->isNotEmpty() ? 'mb-3' : '' }}">My Appraisal History</p>
                     @if ($myYears->isNotEmpty())
@@ -143,10 +143,10 @@
                 </div>
 
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-indigo-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Year</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Status</th>
                             <th class="px-6 py-3"></th>
                         </tr>
                     </thead>

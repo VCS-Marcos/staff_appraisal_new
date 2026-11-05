@@ -30,11 +30,18 @@ export default {
                     900: '#1a2d5a',
                     950: '#111c3a',
                 },
+                // The logo's golden ribbon yellow, with soft tints for backgrounds.
                 accent: {
+                    50: '#fffdeb',
+                    100: '#fdf8c8',
+                    200: '#faf193',
                     300: '#f7ee7a',
                     400: '#f2df2f',
                     500: '#e0cc10',
+                    600: '#a89500',
                 },
+                // Page background: a very light tint of the brand blue.
+                canvas: '#f3f6fc',
             },
         },
     },

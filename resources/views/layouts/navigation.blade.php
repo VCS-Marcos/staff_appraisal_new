@@ -12,13 +12,13 @@
     }
 @endphp
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-200 border-t-4 border-t-accent-400">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-200 border-t-4 border-t-accent-400 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Row 1: Branding + account actions -->
         <div class="flex items-center justify-between h-16">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-2 min-w-0">
                 <x-application-logo class="h-9 w-auto shrink-0" />
-                <span class="font-bold text-gray-900 truncate">{{ config('app.name') }} System</span>
+                <span class="font-bold text-indigo-900 truncate">{{ config('app.name') }} System</span>
             </a>
 
             <div class="hidden sm:flex items-center gap-2">
@@ -56,8 +56,8 @@
         <div class="hidden sm:flex gap-1 -mb-px overflow-x-auto">
             @foreach ($tabs as $tab)
                 <a href="{{ route($tab['route']) }}"
-                   class="inline-flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition
-                          {{ $tab['active'] ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                   class="inline-flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium border-b-[3px] whitespace-nowrap transition
+                          {{ $tab['active'] ? 'border-accent-400 text-indigo-900 font-semibold' : 'border-transparent text-gray-500 hover:text-indigo-700 hover:border-indigo-200' }}">
                     <x-icon :name="$tab['icon']" class="w-4 h-4" />
                     {{ __($tab['label']) }}
                 </a>

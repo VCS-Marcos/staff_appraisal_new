@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Review Appraisal') }} — {{ $appraisal->employee->name }}</h2>
+        <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('Review Appraisal') }} — {{ $appraisal->employee->name }}</h2>
     </x-slot>
 
     <div class="py-12">
@@ -29,14 +29,14 @@
             <x-appraisal-header :appraisal="$appraisal" />
 
             @if ($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 text-sm">
+                <x-notice tone="danger">
                     <p class="font-semibold mb-1">Your review couldn't be submitted — please fix the following:</p>
                     <ul class="list-disc list-inside space-y-0.5">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                </div>
+                </x-notice>
             @endif
 
             <form id="review-form" method="POST" action="{{ route('appraisals.review.update', $appraisal) }}" class="space-y-6" x-data="appraisalReviewForm({{ Js::from(['tab' => $errorTab, 'nextYearTargets' => $initialNextYearTargets]) }})">
@@ -53,160 +53,144 @@
                         prompt="Move to sign-off? You won't be able to edit after this." />
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                     <div class="flex items-center gap-6 border-b border-gray-200 mb-6 overflow-x-auto">
-                        <button type="button" @click="tab = 'targets'" :class="tab === 'targets' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">1 — Target Review</button>
-                        <button type="button" @click="tab = 'performance'" :class="tab === 'performance' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">2 — Performance</button>
-                        <button type="button" @click="tab = 'new-targets'" :class="tab === 'new-targets' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">3 — New Targets</button>
-                        <button type="button" @click="tab = 'cpd'" :class="tab === 'cpd' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-3 -mb-px border-b-2 text-sm font-medium whitespace-nowrap">4 — CPD Log</button>
+                        <button type="button" @click="tab = 'targets'" :class="tab === 'targets' ? 'border-accent-400 text-indigo-900 font-semibold' : 'border-transparent text-gray-500 hover:text-indigo-700 hover:border-indigo-200'" class="pb-3 -mb-px border-b-[3px] text-sm font-medium whitespace-nowrap">1 — Target Review</button>
+                        <button type="button" @click="tab = 'performance'" :class="tab === 'performance' ? 'border-accent-400 text-indigo-900 font-semibold' : 'border-transparent text-gray-500 hover:text-indigo-700 hover:border-indigo-200'" class="pb-3 -mb-px border-b-[3px] text-sm font-medium whitespace-nowrap">2 — Performance</button>
+                        <button type="button" @click="tab = 'new-targets'" :class="tab === 'new-targets' ? 'border-accent-400 text-indigo-900 font-semibold' : 'border-transparent text-gray-500 hover:text-indigo-700 hover:border-indigo-200'" class="pb-3 -mb-px border-b-[3px] text-sm font-medium whitespace-nowrap">3 — New Targets</button>
+                        <button type="button" @click="tab = 'cpd'" :class="tab === 'cpd' ? 'border-accent-400 text-indigo-900 font-semibold' : 'border-transparent text-gray-500 hover:text-indigo-700 hover:border-indigo-200'" class="pb-3 -mb-px border-b-[3px] text-sm font-medium whitespace-nowrap">4 — CPD Log</button>
                     </div>
 
                     <div x-show="tab === 'targets'">
-                        <p class="text-xs text-gray-500 mb-4">Employee's responses for this appraisal.</p>
+                        <x-section-heading :title="'SECTION 1: REVIEW OF '.$appraisal->year.' TARGETS'" hint="Employee's responses for this appraisal." />
                         <div class="space-y-4">
                             @foreach ($appraisal->currentTargets as $i => $target)
-                                <div class="border border-gray-200 rounded-md p-4">
-                                    <input type="hidden" name="targets[{{ $i }}][id]" value="{{ $target->id }}">
-                                    <div class="text-sm font-semibold text-gray-700">Target {{ $target->target_number }}:</div>
-                                    <p class="text-sm text-gray-800 mt-1 whitespace-pre-line">{{ $target->target_text ?: '—' }}</p>
-                                    @include('appraisals._target-actions', ['target' => $target])
-                                    <div class="mt-2 text-sm"><span class="text-gray-500">Target Met:</span> <span class="font-medium">{{ $target->target_met ? ucfirst($target->target_met->value) : '—' }}</span></div>
+                                <input type="hidden" name="targets[{{ $i }}][id]" value="{{ $target->id }}">
+                                <x-target-card :target="$target" show-met>
                                     @if ($target->comments)
-                                        <div class="mt-1 text-sm"><span class="text-gray-500">Staff Comments:</span> {{ $target->comments }}</div>
+                                        <x-target-voice who="Staff comments" tone="staff">{{ $target->comments }}</x-target-voice>
                                     @endif
 
-                                    <div class="mt-4 pt-3 border-t border-gray-100">
-                                        <x-input-label :for="'reviewer_comments_'.$i" value="Reviewer Comments (optional)" />
-                                        <textarea id="reviewer_comments_{{ $i }}" name="targets[{{ $i }}][reviewer_comments]" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old("targets.$i.reviewer_comments", $target->reviewer_comments) }}</textarea>
+                                    <div class="rounded-lg border-l-4 border-accent-400 bg-accent-50 px-3 py-2">
+                                        <label for="reviewer_comments_{{ $i }}" class="label-caps block mb-1">Reviewer comments (optional)</label>
+                                        <textarea id="reviewer_comments_{{ $i }}" name="targets[{{ $i }}][reviewer_comments]" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm">{{ old("targets.$i.reviewer_comments", $target->reviewer_comments) }}</textarea>
                                         <x-input-error :messages="$errors->get('targets.'.$i.'.reviewer_comments')" class="mt-2" />
                                     </div>
-                                </div>
+                                </x-target-card>
                             @endforeach
                         </div>
                     </div>
 
                     <div x-show="tab === 'performance'" x-cloak>
-                        <div class="mb-6">
-                            <h3 class="text-sm font-semibold text-gray-700">Self-Reflection</h3>
-                            <p class="text-xs text-gray-500 mb-1">Employee's reflection on their performance over the last twelve months</p>
-                            <p class="text-sm text-gray-800 whitespace-pre-line">{{ $appraisal->self_reflection ?: '—' }}</p>
-                        </div>
+                        <x-section-heading title="SECTION 2: PERFORMANCE REVIEW" />
+                        <div class="space-y-4">
+                            <x-panel tone="staff" title="Self-reflection" hint="Employee's reflection on their performance over the last twelve months">
+                                <div class="text-[15px] text-gray-900 whitespace-pre-line">{{ $appraisal->self_reflection ?: '—' }}</div>
+                            </x-panel>
 
-                        {{-- Set when the appraisal is created (or edited by an admin); read-only for the reviewer. --}}
-                        <dl class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                            <div>
-                                <dt class="text-gray-500">Appraisal Date</dt>
-                                <dd class="font-medium text-gray-900">{{ optional($appraisal->appraisal_date)->format('d M Y') ?? '—' }}</dd>
+                            {{-- Set when the appraisal is created (or edited by an admin); read-only for the reviewer. --}}
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                <x-fact label="Appraisal date">{{ optional($appraisal->appraisal_date)->format('d M Y') ?? '—' }}</x-fact>
+                                <x-fact label="Time">{{ $appraisal->timeLabel() ?? '—' }}</x-fact>
+                                <x-fact label="Venue / location">{{ $appraisal->venue ?: '—' }}</x-fact>
                             </div>
-                            <div>
-                                <dt class="text-gray-500">Time</dt>
-                                <dd class="font-medium text-gray-900">{{ $appraisal->timeLabel() ?? '—' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-gray-500">Venue / Location</dt>
-                                <dd class="font-medium text-gray-900">{{ $appraisal->venue ?: '—' }}</dd>
-                            </div>
-                        </dl>
 
-                        <x-input-label for="reviewer_comments" value="Reviewer's Comments and Actions" />
-                        <textarea id="reviewer_comments" name="reviewer_comments" rows="8" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('reviewer_comments', $appraisal->reviewer_comments) }}</textarea>
-                        <x-input-error :messages="$errors->get('reviewer_comments')" class="mt-2" />
+                            <x-panel edit tone="reviewer" title="Reviewer's comments and actions" hint="(to be completed by the appraiser)">
+                                <textarea id="reviewer_comments" name="reviewer_comments" rows="8" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm">{{ old('reviewer_comments', $appraisal->reviewer_comments) }}</textarea>
+                                <x-input-error :messages="$errors->get('reviewer_comments')" class="mt-2" />
+                            </x-panel>
 
-                        <div class="mt-4">
-                            <x-input-label value="Overall Rating" />
-                            <div class="flex flex-col gap-2 mt-1">
-                                @foreach (\App\Enums\OverallRating::cases() as $rating)
-                                    <label class="inline-flex items-center text-sm">
-                                        <input type="radio" name="overall_rating" value="{{ $rating->value }}"
-                                               @checked(old('overall_rating', $appraisal->overall_rating?->value) === $rating->value)
-                                               class="text-indigo-600 focus:ring-indigo-500">
-                                        <span class="ms-2">{{ $rating->value }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                            <x-input-error :messages="$errors->get('overall_rating')" class="mt-2" />
-                        </div>
+                            <x-panel edit title="Overall rating" hint="Choose the one that best describes this year.">
+                                <div class="grid gap-2 sm:grid-cols-3">
+                                    @foreach (\App\Enums\OverallRating::cases() as $rating)
+                                        @php
+                                            $ratingColour = match ($rating->value) {
+                                                'Exceeded All Targets' => 'peer-checked:border-emerald-600 peer-checked:bg-emerald-50 peer-checked:text-emerald-900',
+                                                'Met All Targets' => 'peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-900',
+                                                default => 'peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-900',
+                                            };
+                                        @endphp
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="overall_rating" value="{{ $rating->value }}"
+                                                   @checked(old('overall_rating', $appraisal->overall_rating?->value) === $rating->value)
+                                                   class="peer sr-only">
+                                            <span class="flex h-full items-center justify-center rounded-lg border-2 border-gray-200 bg-white px-3 py-3 text-center text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-2 {{ $ratingColour }}">{{ $rating->value }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <x-input-error :messages="$errors->get('overall_rating')" class="mt-2" />
+                            </x-panel>
 
-                        <div class="mt-4">
-                            <x-input-label for="next_review_date" value="Next Review Date" />
-                            <x-text-input id="next_review_date" name="next_review_date" type="date" class="block mt-1 w-full sm:w-64" :value="old('next_review_date', optional($appraisal->next_review_date)->format('Y-m-d'))" />
-                            <x-input-error :messages="$errors->get('next_review_date')" class="mt-2" />
+                            <x-panel edit title="Next review date">
+                                <x-text-input id="next_review_date" name="next_review_date" type="date" class="block w-full sm:w-64" :value="old('next_review_date', optional($appraisal->next_review_date)->format('Y-m-d'))" />
+                                <x-input-error :messages="$errors->get('next_review_date')" class="mt-2" />
+                            </x-panel>
                         </div>
                     </div>
 
                     <div x-show="tab === 'new-targets'" x-cloak>
-                        <p class="text-xs text-gray-500 mb-4">Add a card for each target — set the target, the action to be completed, and the success criteria.</p>
+                        <x-section-heading title="SECTION 3: NEW TARGETS" hint="Add a card for each target — set the target, then one or more actions with their success criteria." />
                         <x-input-error :messages="$errors->get('next_year_targets')" class="mb-3" />
 
                         <div class="space-y-4">
                             <template x-for="(t, index) in nextYearTargets" :key="t._k">
-                                <div class="border border-gray-200 rounded-md p-4">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <label class="block text-sm font-medium text-gray-700" x-text="'Target ' + (index + 1)"></label>
-                                        <button type="button" :style="nextYearTargets.length > 1 ? '' : 'display:none'" x-on:click="nextYearTargets.splice(index, 1)" class="text-xs text-red-600 hover:underline">Remove</button>
+                                <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                                    <div class="flex items-center justify-between border-b border-indigo-100 bg-indigo-50 px-4 py-2.5">
+                                        <div class="flex items-center gap-2 text-sm font-bold text-indigo-900">
+                                            <span class="grid h-6 w-6 place-items-center rounded-md bg-indigo-900 text-xs text-white" x-text="index + 1"></span>
+                                            <span x-text="'Target ' + (index + 1)"></span>
+                                        </div>
+                                        <button type="button" :style="nextYearTargets.length > 1 ? '' : 'display:none'" x-on:click="nextYearTargets.splice(index, 1)" class="text-xs font-medium text-red-600 hover:underline">Remove target</button>
                                     </div>
-                                    <textarea :name="'next_year_targets[' + index + '][target_text]'" x-model="t.target_text" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Target"></textarea>
+                                    <div class="space-y-4 p-4">
+                                        <div>
+                                            <label class="label-caps mb-1 block">Target</label>
+                                            <textarea :name="'next_year_targets[' + index + '][target_text]'" x-model="t.target_text" rows="2" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm" placeholder="What is the target?"></textarea>
+                                        </div>
 
-                                    <template x-for="(pair, j) in nextYearTargets[index].actions" :key="pair._k">
-                                        <div class="mt-3 pl-3 border-l-2 border-indigo-100">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-xs font-semibold text-gray-500 uppercase" x-text="'Action ' + (j + 1)"></span>
-                                                <button type="button" :style="nextYearTargets[index].actions.length > 1 ? '' : 'display:none'" x-on:click="removeAction(index, j)" class="text-xs text-red-600 hover:underline">Remove</button>
+                                        <div>
+                                            <div class="mb-2 flex items-center justify-between">
+                                                <span class="label-caps">Actions &amp; success criteria</span>
+                                                <span class="text-xs text-gray-500" x-text="nextYearTargets[index].actions.length + (nextYearTargets[index].actions.length === 1 ? ' pair' : ' pairs')"></span>
                                             </div>
 
-                                            <label class="block text-sm font-medium text-gray-700 mt-1">Action to be Completed</label>
-                                            <textarea :name="'next_year_targets[' + index + '][actions][' + j + '][action_text]'" x-model="pair.action_text" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                            <div class="space-y-2.5">
+                                                <template x-for="(pair, j) in nextYearTargets[index].actions" :key="pair._k">
+                                                    <div class="rounded-lg border border-l-4 border-gray-200 border-l-indigo-600 bg-slate-50 p-3">
+                                                        <div class="mb-2 flex items-center justify-between">
+                                                            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700">
+                                                                <span class="grid h-5 w-5 place-items-center rounded-full bg-indigo-600 text-[11px] text-white" x-text="j + 1"></span>
+                                                                <span x-text="'Action ' + (j + 1)"></span>
+                                                            </span>
+                                                            <button type="button" :style="nextYearTargets[index].actions.length > 1 ? '' : 'display:none'" x-on:click="removeAction(index, j)" class="text-xs font-medium text-red-600 hover:underline">Remove</button>
+                                                        </div>
+                                                        <div class="grid gap-3 sm:grid-cols-2">
+                                                            <div>
+                                                                <label class="label-caps mb-1 block">Action to be completed</label>
+                                                                <textarea :name="'next_year_targets[' + index + '][actions][' + j + '][action_text]'" x-model="pair.action_text" rows="3" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm"></textarea>
+                                                            </div>
+                                                            <div>
+                                                                <label class="label-caps mb-1 block">Success criteria</label>
+                                                                <textarea :name="'next_year_targets[' + index + '][actions][' + j + '][success_criteria]'" x-model="pair.success_criteria" rows="3" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm" placeholder="How will we know it is done?"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
 
-                                            <label class="block text-sm font-medium text-gray-700 mt-3">Success Criteria</label>
-                                            <textarea :name="'next_year_targets[' + index + '][actions][' + j + '][success_criteria]'" x-model="pair.success_criteria" rows="2" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                            <button type="button" x-on:click="addAction(index)" class="mt-2.5 w-full rounded-lg border-2 border-dashed border-indigo-200 py-2.5 text-sm font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50">+ Add another action &amp; success criteria</button>
                                         </div>
-                                    </template>
-
-                                    <button type="button" x-on:click="addAction(index)" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add another action &amp; success criteria</button>
+                                    </div>
                                 </div>
                             </template>
                         </div>
 
-                        <button type="button" x-on:click="addTarget()" class="mt-3 text-sm text-indigo-600 hover:underline">+ Add Target</button>
+                        <button type="button" x-on:click="addTarget()" class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-indigo-700 shadow-sm transition hover:bg-indigo-50">+ Add Target</button>
                     </div>
 
                     <div x-show="tab === 'cpd'" x-cloak>
-                        <p class="text-xs text-gray-500 mb-4">Professional development activities logged by the employee this year.</p>
-                        @if ($appraisal->professionalDevelopment->isNotEmpty())
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200 text-sm">
-                                    <thead>
-                                        <tr class="text-left text-xs text-gray-500 uppercase">
-                                            <th class="py-2 pr-4">Activity</th>
-                                            <th class="py-2 pr-4">Nature</th>
-                                            <th class="py-2 pr-4">Provider</th>
-                                            <th class="py-2 pr-4">Impact on Practice</th>
-                                            <th class="py-2 pr-4">Hours</th>
-                                            <th class="py-2">Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-100">
-                                        @foreach ($appraisal->professionalDevelopment as $pd)
-                                            <tr>
-                                                <td class="py-2 pr-4 text-gray-900">{{ $pd->activity_name }}</td>
-                                                <td class="py-2 pr-4 text-gray-500">{{ $pd->nature->value }}</td>
-                                                <td class="py-2 pr-4 text-gray-500">{{ $pd->provider ?? '—' }}</td>
-                                                <td class="py-2 pr-4 text-gray-500">{{ $pd->impact_on_practice ?? '—' }}</td>
-                                                <td class="py-2 pr-4 text-gray-500">{{ number_format($pd->hours, 2) }}</td>
-                                                <td class="py-2 text-gray-500">{{ optional($pd->activity_date)->format('d M Y') ?? '—' }}</td>
-                                            </tr>
-                                        @endforeach
-                                        <tr class="font-semibold">
-                                            <td class="py-2 pr-4 text-gray-700" colspan="4">Total</td>
-                                            <td class="py-2 pr-4 text-gray-900">{{ number_format($appraisal->professionalDevelopment->sum('hours'), 2) }}</td>
-                                            <td></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <p class="text-sm text-gray-500">No professional development activity logged yet.</p>
-                        @endif
+                        <x-section-heading title="SECTION 4: PROFESSIONAL DEVELOPMENT RECORD" hint="Professional development activities logged by the employee this year." />
+                        @include('appraisals._pd-list')
                     </div>
                 </div>
             </form>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Staff Accounts') }}</h2>
+            <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('Staff Accounts') }}</h2>
             <div class="flex items-center gap-3">
                 <a href="{{ route('admin.users.import') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                     <x-icon name="upload" class="w-3.5 h-3.5" /> Import CSV
@@ -15,9 +15,9 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
                 @if (session('status'))
-                    <div class="p-4 bg-green-50 text-green-700 text-sm">{{ session('status') }}</div>
+                    <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-900 text-sm">{{ session('status') }}</div>
                 @endif
 
                 <div class="p-4 border-b border-gray-100">
@@ -48,15 +48,15 @@
                 </div>
 
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-indigo-50">
                         <tr>
                             <th class="pl-6 pr-0 py-3 w-14"><span class="sr-only">Photo</span></th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Line Manager</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Position</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Line Manager</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Status</th>
                             <th class="px-6 py-3"></th>
                         </tr>
                     </thead>

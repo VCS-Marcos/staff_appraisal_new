@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Import Results') }}</h2>
+        <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('Import Results') }}</h2>
     </x-slot>
 
     @php
@@ -28,22 +28,22 @@
             </div>
 
             @if ($hasGenerated)
-                <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg">
+                <div class="p-4 bg-accent-50 border-l-4 border-accent-400 text-amber-900 text-sm rounded-xl">
                     <strong>Save these passwords now.</strong> They're generated once for newly created accounts and
                     are not shown again — this page won't be reachable after you navigate away.
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-indigo-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Row</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Generated Password</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Note</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Row</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Generated Password</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Note</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">

@@ -1,12 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-indigo-900 leading-tight">
             {{ __('Dashboard') }}
         </h2>
     </x-slot>
 
     @php
-        $cardBase = 'bg-white border border-gray-200 rounded-xl p-4 block transition hover:border-indigo-300 hover:shadow-sm';
+        $cardBase = 'bg-white ring-1 ring-gray-900/5 shadow-sm rounded-xl p-4 block transition hover:shadow-md hover:ring-indigo-200';
     @endphp
 
     <div class="py-12">
@@ -14,25 +14,25 @@
 
             @if (auth()->user()->isAdmin())
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <a href="{{ route('admin.users.index') }}" class="{{ $cardBase }}">
+                    <a href="{{ route('admin.users.index') }}" class="{{ $cardBase }} border-t-4 border-t-indigo-900">
                         <div class="text-2xl font-bold text-gray-800">{{ $stats['users'] }}</div>
                         <div class="text-sm text-gray-500">Staff Accounts</div>
                     </a>
-                    <a href="{{ route('admin.appraisals.index', ['year' => $stats['current_year']]) }}" class="{{ $cardBase }}">
+                    <a href="{{ route('admin.appraisals.index', ['year' => $stats['current_year']]) }}" class="{{ $cardBase }} border-t-4 border-t-indigo-500">
                         <div class="text-2xl font-bold text-indigo-600">{{ $stats['current_year'] }}</div>
                         <div class="text-sm text-gray-500">Current Year</div>
                     </a>
-                    <a href="{{ route('admin.appraisals.index', ['status' => 'in_progress']) }}" class="{{ $cardBase }}">
+                    <a href="{{ route('admin.appraisals.index', ['status' => 'in_progress']) }}" class="{{ $cardBase }} border-t-4 border-t-accent-400">
                         <div class="text-2xl font-bold text-amber-600">{{ $stats['pending_employee'] + $stats['pending_reviewer'] + $stats['pending_signoff'] }}</div>
                         <div class="text-sm text-gray-500">In Progress</div>
                     </a>
-                    <a href="{{ route('admin.appraisals.index', ['status' => 'completed']) }}" class="{{ $cardBase }}">
+                    <a href="{{ route('admin.appraisals.index', ['status' => 'completed']) }}" class="{{ $cardBase }} border-t-4 border-t-emerald-500">
                         <div class="text-2xl font-bold text-emerald-600">{{ $stats['completed'] }}</div>
                         <div class="text-sm text-gray-500">Completed</div>
                     </a>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                     <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Quick Actions</h3>
                     <div class="flex flex-wrap gap-4">
                         <a href="{{ route('admin.appraisals.create') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
@@ -48,7 +48,7 @@
                 </div>
             @else
                 @if (auth()->user()->isReviewer())
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                         <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Quick Actions</h3>
                         <a href="{{ route('admin.appraisals.create') }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline">
                             <x-icon name="plus" class="w-4 h-4" /> Create an appraisal for one of your staff
@@ -56,19 +56,19 @@
                     </div>
                 @endif
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
+                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }} border-t-4 border-t-indigo-900">
                         <div class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</div>
                         <div class="text-sm text-gray-500">{{ auth()->user()->isReviewer() ? 'Team Appraisals' : 'My Appraisals' }}</div>
                     </a>
-                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
+                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }} border-t-4 border-t-accent-400">
                         <div class="text-2xl font-bold text-amber-600">{{ $stats['pending'] }}</div>
                         <div class="text-sm text-gray-500">{{ auth()->user()->isReviewer() ? 'Awaiting My Review' : 'Awaiting My Action' }}</div>
                     </a>
-                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
+                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }} border-t-4 border-t-indigo-500">
                         <div class="text-2xl font-bold text-indigo-600">{{ $stats['in_progress'] }}</div>
                         <div class="text-sm text-gray-500">In Progress</div>
                     </a>
-                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }}">
+                    <a href="{{ route('appraisals.index') }}" class="{{ $cardBase }} border-t-4 border-t-emerald-500">
                         <div class="text-2xl font-bold text-emerald-600">{{ $stats['completed'] }}</div>
                         <div class="text-sm text-gray-500">Completed</div>
                     </a>
@@ -76,7 +76,7 @@
             @endif
 
             @if (isset($teamAppraisals) && $teamAppraisals->isNotEmpty())
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                     <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Your Team's Appraisals</h3>
                     <div class="divide-y divide-gray-100">
                         @foreach ($teamAppraisals as $appraisal)
@@ -95,7 +95,7 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                 <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">My Appraisals</h3>
                 @if ($myAppraisals->isEmpty())
                     <p class="text-gray-500 text-sm">You have no appraisals yet.</p>

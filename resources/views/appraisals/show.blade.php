@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Staff Appraisal') }}</h2>
+            <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('Staff Appraisal') }}</h2>
             <x-status-badge :status="$appraisal->status" />
         </div>
     </x-slot>
@@ -9,7 +9,7 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
             @if (session('status'))
-                <div class="p-4 bg-green-50 text-green-700 text-sm rounded-md">{{ session('status') }}</div>
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-900 text-sm rounded-xl">{{ session('status') }}</div>
             @endif
 
             <x-appraisal-header :appraisal="$appraisal" />

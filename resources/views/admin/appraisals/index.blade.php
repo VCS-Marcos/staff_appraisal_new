@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('All Appraisals') }}</h2>
+            <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('All Appraisals') }}</h2>
             <div class="flex items-center gap-3">
                 <a href="{{ route('admin.appraisals.export', request()->query()) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                     <x-icon name="download" class="w-3.5 h-3.5" /> Export CSV
@@ -18,16 +18,16 @@
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
                 @foreach (\App\Enums\AppraisalStatus::cases() as $status)
                     <a href="{{ route('admin.appraisals.index', array_merge(request()->except('page'), ['status' => $status->value])) }}"
-                       class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4 block transition hover:ring-2 hover:ring-indigo-200 {{ request('status') === $status->value ? 'ring-2 ring-indigo-400' : '' }}">
+                       class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-4 block transition hover:ring-2 hover:ring-indigo-200 {{ request('status') === $status->value ? 'ring-2 ring-indigo-400' : '' }}">
                         <div class="text-2xl font-bold text-gray-800">{{ $statusCounts[$status->value] ?? 0 }}</div>
                         <div class="text-xs text-gray-500">{{ $status->label() }}</div>
                     </a>
                 @endforeach
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
                 @if (session('status'))
-                    <div class="p-4 bg-green-50 text-green-700 text-sm">{{ session('status') }}</div>
+                    <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-900 text-sm">{{ session('status') }}</div>
                 @endif
 
                 <div class="p-4 border-b border-gray-100">
@@ -65,13 +65,13 @@
                 </div>
 
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-indigo-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reviewer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mode</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Employee</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Reviewer</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Year</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wide">Mode</th>
                             <th class="px-6 py-3"></th>
                         </tr>
                     </thead>

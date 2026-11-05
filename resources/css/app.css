@@ -5,3 +5,10 @@
 [x-cloak] {
     display: none !important;
 }
+
+@layer components {
+    /* Small, quiet field/section captions: clearly different from the values they label. */
+    .label-caps {
+        @apply text-[11px] font-bold uppercase tracking-wider text-gray-500;
+    }
+}

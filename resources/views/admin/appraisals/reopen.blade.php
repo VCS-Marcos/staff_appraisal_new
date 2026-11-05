@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Send Appraisal Back') }}</h2>
+        <h2 class="font-semibold text-xl text-indigo-900 leading-tight">{{ __('Send Appraisal Back') }}</h2>
     </x-slot>
 
     @php
@@ -16,14 +16,14 @@
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white overflow-hidden shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                 <div class="mb-4">
                     <div class="font-semibold text-gray-900">{{ $appraisal->employee->name }}</div>
                     <div class="text-sm text-gray-500">{{ $appraisal->year }} &middot; currently <strong>{{ $appraisal->status->label() }}</strong></div>
                 </div>
 
                 @if ($hasSignature)
-                    <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg mb-4">
+                    <div class="p-4 bg-accent-50 border-l-4 border-accent-400 text-amber-900 text-sm rounded-xl mb-4">
                         This appraisal already has a signature captured. Sending it back will <strong>clear both
                         signatures</strong> — whoever signed will need to sign again once it's finalized, since the
                         record they signed may no longer match what's in it.

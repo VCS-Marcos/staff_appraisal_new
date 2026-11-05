@@ -8,29 +8,57 @@
         body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #1f2937; }
         h1 { font-size: 18px; margin: 0 0 2px; color: #111827; }
         .subtitle { color: #6b7280; font-size: 10px; margin: 0 0 16px; }
-        h2 { font-size: 12px; margin: 0 0 10px; color: #ffffff; background-color: #1b336d; padding: 6px 10px; }
-        h3 { font-size: 11px; margin: 10px 0 2px; color: #374151; }
+        /* Section title bar: brand navy with the logo's yellow as an accent. */
+        h2 { font-size: 11px; margin: 0; color: #ffffff; background-color: #1a2d5a; border-left: 5px solid #f2df2f; padding: 7px 10px; letter-spacing: 0.02em; }
         p { margin: 0 0 8px; line-height: 1.4; }
         .muted { color: #6b7280; }
-        .section { margin-bottom: 14px; border: 1px solid #e5e7eb; }
+        .section { margin-bottom: 14px; border: 1px solid #d9e0ee; }
+        .section.details { border-top: 4px solid #1d3d87; }
         .section-body { padding: 10px 12px; }
+        .hint { color: #6b7280; font-size: 9px; margin: 0 0 6px; }
         table.fields { width: 100%; border-collapse: collapse; }
         table.fields td { padding: 4px 10px 4px 0; vertical-align: top; width: 50%; }
-        .label { color: #6b7280; display: block; font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 1px; }
-        .card { border: 1px solid #e5e7eb; background-color: #f9fafb; padding: 8px 10px; margin-bottom: 8px; }
-        .card:last-child { margin-bottom: 0; }
-        .card .title { font-weight: bold; margin-bottom: 3px; color: #111827; }
+        .label { color: #6b7280; display: block; font-size: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+
+        /* Target card */
+        table.tcard { width: 100%; border: 1px solid #d1d5db; border-collapse: collapse; margin-bottom: 10px; page-break-inside: avoid; }
+        td.thead { background-color: #f8fafc; padding: 7px 8px; border-bottom: 1px solid #e5e7eb; }
+        td.tchip { width: 58px; background-color: #1a2d5a; color: #ffffff; font-size: 8px; font-weight: bold; text-align: center; padding: 4px 6px; letter-spacing: 0.05em; white-space: nowrap; }
+        td.ttitle { padding-left: 9px; font-size: 11.5px; font-weight: bold; color: #111827; vertical-align: middle; }
+        td.tmet { width: 80px; text-align: right; vertical-align: middle; }
+        td.tbody { padding: 6px 8px; }
+        table.pairs { width: 100%; border-collapse: collapse; }
+        table.pairs th { background-color: #eef3fc; color: #1b336d; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.05em; text-align: left; padding: 4px 6px; }
+        table.pairs td { padding: 5px 6px; vertical-align: top; border-bottom: 1px solid #eef0f5; }
+        table.pairs td.n { color: #244aa5; font-weight: bold; }
+        td.tcomments { background-color: #f8fafc; border-top: 1px solid #e5e7eb; padding: 6px 8px 2px; }
+
+        /* Whose words they are: grey strip = staff, the logo's yellow = reviewer */
+        table.voice { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+        table.voice td { padding: 5px 9px; }
+        table.voice.staff td { background-color: #ffffff; border: 1px solid #e5e7eb; border-left: 4px solid #94a3b8; }
+        table.voice.reviewer td { background-color: #fffdeb; border: 1px solid #f4eba6; border-left: 4px solid #f2df2f; }
+        .strip { margin-bottom: 8px; }
+
+        /* CPD */
         table.pd { width: 100%; border-collapse: collapse; font-size: 10px; }
-        table.pd th { text-align: left; color: #6b7280; text-transform: uppercase; font-size: 8.5px; padding: 4px 6px; border-bottom: 1px solid #d1d5db; }
-        table.pd td { padding: 5px 6px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
-        table.pd tr.total td { font-weight: bold; border-top: 1px solid #d1d5db; border-bottom: none; }
-        table.signoff { width: 100%; border-collapse: collapse; }
-        table.signoff td { width: 50%; padding: 10px; border: 1px solid #e5e7eb; background-color: #f9fafb; }
-        .footer { margin-top: 16px; font-size: 8.5px; color: #9ca3af; text-align: center; }
+        table.pd th { background-color: #eef3fc; color: #1b336d; text-align: left; text-transform: uppercase; letter-spacing: 0.05em; font-size: 7.5px; padding: 5px 6px; }
+        table.pd td { padding: 5px 6px; border-bottom: 1px solid #eef0f5; vertical-align: top; }
+        table.pd tr.alt td { background-color: #f8fafc; }
+        table.pd tr.total td { font-weight: bold; background-color: #fffdeb; border-top: 2px solid #f2df2f; border-bottom: none; color: #1a2d5a; }
+
+        /* Sign-off */
+        table.signoff { width: 100%; border-collapse: separate; border-spacing: 0; }
+        table.signoff td { width: 50%; padding: 8px 10px; }
+        table.signoff td.first { border-right: 8px solid #ffffff; }
+        table.signoff td.signed { background-color: #ecfdf5; border-left: 4px solid #10b981; }
+        table.signoff td.unsigned { background-color: #fffdeb; border-left: 4px solid #f2df2f; }
+
+        .footer { margin-top: 16px; padding-top: 6px; border-top: 2px solid #f2df2f; font-size: 8.5px; color: #9ca3af; text-align: center; }
         .header-bar { background-color: #1a2d5a; border-bottom: 3px solid #f2df2f; color: #ffffff; padding: 12px 14px; margin-bottom: 14px; }
         .header-bar h1 { color: #ffffff; }
         .header-bar .subtitle { color: #d1d5db; margin-bottom: 0; }
-        .status-badge { display: inline-block; background-color: #374151; color: #ffffff; padding: 2px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.03em; }
+        .status-badge { display: inline-block; background-color: #f2df2f; color: #1a2d5a; font-weight: bold; padding: 2px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.03em; }
     </style>
 </head>
 <body>
@@ -59,7 +87,7 @@
             ? 'data:image/jpeg;base64,'.base64_encode($appraisal->employee->photo->data)
             : null;
     @endphp
-    <div class="section">
+    <div class="section details">
         <div class="section-body">
             <table style="width: 100%; border-collapse: collapse;">
             <tr>
@@ -94,19 +122,7 @@
         <h2>SECTION 1: REVIEW OF {{ $appraisal->year }} TARGETS</h2>
         <div class="section-body">
             @forelse ($appraisal->currentTargets as $target)
-                <div class="card">
-                    <div class="title">Target {{ $target->target_number }}:</div>
-                    <p>{{ $target->target_text ?: '—' }}</p>
-                    @include('appraisals._target-actions-pdf', ['target' => $target])
-                    <p><span class="muted">Target Met:</span> {{ $target->target_met ? ucfirst($target->target_met->value) : 'Not yet answered' }}</p>
-                    @if ($target->comments)
-                        <p><span class="muted">Staff Comments:</span> {{ $target->comments }}</p>
-                    @endif
-
-                    @if ($target->reviewer_comments)
-                        <p><span class="muted">Reviewer Comments:</span> {{ $target->reviewer_comments }}</p>
-                    @endif
-                </div>
+                @include('appraisals._pdf-target', ['target' => $target, 'showMet' => true])
             @empty
                 <p class="muted">No targets recorded for this appraisal.</p>
             @endforelse
@@ -116,18 +132,26 @@
     <div class="section">
         <h2>SECTION 2: PERFORMANCE REVIEW</h2>
         <div class="section-body">
-            <h3>Self-Reflection</h3>
-            <p class="muted">Reflect on your performance over the last twelve months</p>
-            <p>{{ $appraisal->self_reflection ?: '—' }}</p>
+            <table class="voice staff strip" cellspacing="0" cellpadding="0">
+                <tr><td>
+                    <span class="label">Self-reflection</span>
+                    <p class="hint">Reflect on your performance over the last twelve months</p>
+                    {{ $appraisal->self_reflection ?: '—' }}
+                </td></tr>
+            </table>
 
-            <h3>Reviewer's Comments and Actions</h3>
-            <p class="muted">(to be completed by the appraiser)</p>
-            <p>{{ $appraisal->reviewer_comments ?: '—' }}</p>
+            <table class="voice reviewer strip" cellspacing="0" cellpadding="0">
+                <tr><td>
+                    <span class="label">Reviewer's comments and actions</span>
+                    <p class="hint">(to be completed by the appraiser)</p>
+                    {{ $appraisal->reviewer_comments ?: '—' }}
+                </td></tr>
+            </table>
 
-            <table class="fields">
+            <table class="fields" style="margin-top: 4px;">
                 <tr>
-                    <td><span class="label">Overall Rating</span>{{ $appraisal->overall_rating?->value ?? '—' }}</td>
-                    <td><span class="label">Next Review Date</span>{{ optional($appraisal->next_review_date)->format('d M Y') ?? '—' }}</td>
+                    <td><span class="label">Overall Rating</span><strong>{{ $appraisal->overall_rating?->value ?? '—' }}</strong></td>
+                    <td><span class="label">Next Review Date</span><strong>{{ optional($appraisal->next_review_date)->format('d M Y') ?? '—' }}</strong></td>
                 </tr>
             </table>
         </div>
@@ -138,11 +162,7 @@
             <h2>SECTION 3: NEW TARGETS</h2>
             <div class="section-body">
                 @foreach ($appraisal->nextYearTargets as $target)
-                    <div class="card">
-                        <div class="title">Target {{ $target->target_number }}:</div>
-                        <p>{{ $target->target_text ?: '—' }}</p>
-                        @include('appraisals._target-actions-pdf', ['target' => $target])
-                    </div>
+                    @include('appraisals._pdf-target', ['target' => $target])
                 @endforeach
             </div>
         </div>
@@ -162,7 +182,7 @@
                         <th style="width: 12%;">Date</th>
                     </tr>
                     @foreach ($appraisal->professionalDevelopment as $pd)
-                        <tr>
+                        <tr class="{{ $loop->even ? 'alt' : '' }}">
                             <td>{{ $pd->activity_name }}</td>
                             <td>{{ $pd->nature->value }}</td>
                             <td>{{ $pd->provider ?? '—' }}</td>
@@ -186,13 +206,13 @@
         <div class="section-body">
             <table class="signoff">
                 <tr>
-                    <td>
+                    <td class="first {{ $appraisal->employee_signed_at ? 'signed' : 'unsigned' }}">
                         <span class="label">Employee Signature</span>
-                        {{ $appraisal->employee_signed_at ? 'Signed electronically '.$appraisal->employee_signed_at->format('d M Y H:i') : 'Not yet signed' }}
+                        <strong>{{ $appraisal->employee_signed_at ? 'Signed electronically '.$appraisal->employee_signed_at->format('d M Y H:i') : 'Not yet signed' }}</strong>
                     </td>
-                    <td>
+                    <td class="{{ $appraisal->reviewer_signed_at ? 'signed' : 'unsigned' }}">
                         <span class="label">Reviewer Signature</span>
-                        {{ $appraisal->reviewer_signed_at ? 'Signed electronically '.$appraisal->reviewer_signed_at->format('d M Y H:i') : 'Not yet signed' }}
+                        <strong>{{ $appraisal->reviewer_signed_at ? 'Signed electronically '.$appraisal->reviewer_signed_at->format('d M Y H:i') : 'Not yet signed' }}</strong>
                     </td>
                 </tr>
             </table>
